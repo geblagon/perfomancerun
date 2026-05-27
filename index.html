@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance & Wellness Director v2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;--border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);--text:#1a1a18;--text2:#6b6b65;--text3:#9b9b94;--green:#1D9E75;--green-bg:#E1F5EE;--green-text:#085041;--amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#633806;--red:#E24B4A;--red-bg:#FCEBEB;--red-text:#501313;--blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#042C53;--radius:10px;--radius-lg:14px;--sidebar:220px;}
+[data-theme="dark"]{--bg:#141413;--surface:#1e1e1c;--surface2:#282826;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--text:#f0efe9;--text2:#a0a09a;--text3:#606059;--green-bg:#04342C;--green-text:#9FE1CB;--amber-bg:#412402;--amber-text:#FAC775;--red-bg:#501313;--red-text:#F7C1C1;--blue-bg:#042C53;--blue-text:#B5D4F4;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .2s,color .2s;}
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:.5px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:.5px solid var(--border);}
+.logo-icon{width:32px;height:32px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.logo-icon svg{width:18px;height:18px;fill:var(--bg);}
+.logo-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.nav{padding:12px 10px;flex:1;}
+.nav-section{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:background .15s,color .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:inherit;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--surface2);color:var(--text);font-weight:500;}
+.nav-item svg{width:16px;height:16px;opacity:.7;flex-shrink:0;}
+.sidebar-footer{padding:16px;border-top:.5px solid var(--border);}
+.theme-btn{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer;background:none;border:.5px solid var(--border2);border-radius:8px;padding:7px 12px;width:100%;transition:background .15s;font-family:inherit;}
+.hamburger{display:none;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:4px;color:var(--text);}
+.theme-btn:hover{background:var(--surface2);}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:16px;font-weight:500;}
+.topbar-meta{font-size:12px;color:var(--text2);}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;}
+.badge-green{background:var(--green-bg);color:var(--green-text);}
+.badge-amber{background:var(--amber-bg);color:var(--amber-text);}
+.badge-red{background:var(--red-bg);color:var(--red-text);}
+.badge-blue{background:var(--blue-bg);color:var(--blue-text);}
+.content{padding:28px;flex:1;}
+.page{display:none;}
+.page.active{display:block;}
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;}
+.card-title{font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.metric{background:var(--surface2);border-radius:var(--radius);padding:16px;}
+.metric-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.metric-value{font-size:24px;font-weight:500;color:var(--text);line-height:1;}
+.metric-delta{font-size:12px;margin-top:6px;}
+.delta-pos{color:var(--green);}
+.delta-neg{color:var(--red);}
+.delta-neu{color:var(--text3);}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;}
+.charts-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.alert{border-left:3px solid var(--red);background:var(--red-bg);border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;margin-bottom:20px;}
+.alert-title{font-size:12px;font-weight:600;color:var(--red-text);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+.alert-list{list-style:none;}
+.alert-list li{font-size:13px;color:var(--red-text);padding:3px 0;display:flex;align-items:flex-start;gap:6px;}
+.alert-list li::before{content:"→";font-weight:600;flex-shrink:0;}
+.prog-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--border);font-size:13px;}
+.prog-row:last-child{border-bottom:none;}
+.prog-name{color:var(--text);flex:1;}
+.prog-bar-wrap{width:90px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:0 10px;}
+.prog-bar{height:100%;border-radius:3px;}
+.prog-val{font-size:11px;color:var(--text3);min-width:50px;text-align:right;}
+.bar-ok{background:var(--green);}
+.bar-warn{background:var(--amber);}
+.bar-danger{background:var(--red);}
+.action-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);}
+.action-row:last-child{border-bottom:none;}
+.action-name{font-size:13px;color:var(--text);}
+.action-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.ex-table{width:100%;border-collapse:collapse;font-size:13px;}
+.ex-table th{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:6px 10px;border-bottom:.5px solid var(--border2);text-align:left;}
+.ex-table td{padding:9px 10px;border-bottom:.5px solid var(--border);color:var(--text);}
+.ex-table tr:last-child td{border-bottom:none;}
+.ex-table tr:hover td{background:var(--surface2);}
+.tabs{display:flex;gap:4px;background:var(--surface2);padding:4px;border-radius:var(--radius);margin-bottom:20px;}
+.tab{flex:1;padding:7px 12px;font-size:13px;border:none;border-radius:7px;cursor:pointer;background:none;color:var(--text2);font-family:inherit;transition:all .15s;}
+.tab.active{background:var(--surface);color:var(--text);font-weight:500;}
+.meal-row{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:.5px solid var(--border);}
+.meal-row:last-child{border-bottom:none;}
+.meal-time{font-size:12px;font-weight:500;color:var(--text3);min-width:60px;padding-top:2px;}
+.meal-content{flex:1;}
+.meal-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;}
+.meal-items{font-size:12px;color:var(--text2);}
+.meal-kcal{font-size:13px;font-weight:500;color:var(--text);min-width:60px;text-align:right;}
+.legs{display:flex;gap:16px;margin-bottom:10px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.section-title{font-size:18px;font-weight:500;color:var(--text);}
+.section-sub{font-size:13px;color:var(--text2);margin-top:3px;}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-green{background:var(--green);}
+.dot-amber{background:var(--amber);}
+.dot-red{background:var(--red);}
+/* Forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;}
+.form-group input,.form-group select{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s;}
+.form-group input:focus{border-color:var(--blue);}
+.form-group input::placeholder{color:var(--text3);}
+.btn-primary{background:var(--text);color:var(--bg);border:none;border-radius:var(--radius);padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:opacity .15s;}
+.btn-primary:hover{opacity:.85;}
+.btn-secondary{background:var(--surface2);color:var(--text);border:.5px solid var(--border2);border-radius:var(--radius);padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-secondary:hover{background:var(--border);}
+.btn-del{background:var(--red-bg);color:var(--red-text);border:.5px solid var(--red);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;}
+.btn-del:hover{opacity:.8;}
+.btn-analyze{background:var(--surface2);color:var(--text);border:.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;}
+.btn-analyze:hover{background:var(--surface3);}
+.analysis-row td{padding:0!important;}
+.analysis-box{padding:12px 16px;background:var(--surface2);border-top:.5px solid var(--border);font-size:13px;line-height:1.6;color:var(--text);}
+.analysis-loading{color:var(--text2);font-style:italic;font-size:12px;}
+.analysis-pos{color:var(--green);font-weight:500;}
+.analysis-neg{color:var(--amber);font-weight:500;}
+.form-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.empty-state{text-align:center;padding:28px;color:var(--text3);font-size:13px;}
+.data-wrap{overflow-x:auto;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+@media(max-width:900px){
+  /* Modo tarjeta para tablas en mobile */
+  .mcrd{width:100%!important;}
+  .mcrd table,.mcrd thead{display:none!important;}
+  .mcrd-list{display:flex;flex-direction:column;gap:16px;width:100%;}
+  .mcrd-item{background:var(--surface2);border-radius:var(--radius);padding:12px 14px;border:.5px solid var(--border);width:100%;box-sizing:border-box;}
+  .mcrd-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:13px;border-bottom:.5px solid var(--border2);}
+  .mcrd-row:last-child{border-bottom:none;}
+  .mcrd-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;}
+  .mcrd-val{font-size:13px;color:var(--text);text-align:right;}
+  .mcrd-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;padding-top:8px;border-top:.5px solid var(--border);}
+  .mcrd-kms{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+  .parc-pill{font-size:12px;padding:3px 8px;border-radius:6px;background:var(--surface);border:.5px solid var(--border);}
+  .parc-pill.best{background:var(--green-bg);color:var(--green-text);font-weight:500;}
+  .parc-pill.worst{background:var(--amber-bg);color:var(--amber-text);}
+  .parc-pills{display:flex;flex-wrap:wrap;gap:4px;}
+  .sidebar{transform:translateX(-100%);transition:transform .25s;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .charts-grid,.charts-2,.form-grid,.form-grid-3{grid-template-columns:1fr;}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;}
+  .overlay.open{display:block;}
+  .hamburger{display:flex;}
+  .metrics-grid{grid-template-columns:1fr 1fr!important;}
+  .content{padding:16px;}
+  .topbar{padding:12px 16px;}
+  .topbar-title{font-size:14px;}
+  .card{padding:14px 16px;}
+  .section-title{font-size:16px;}
+  .action-row{flex-direction:column;align-items:flex-start;gap:8px;}
+  .data-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .ex-table{font-size:12px;}
+  .ex-table th,.ex-table td{padding:7px 8px;}
+  .tabs{flex-wrap:wrap;}
+  .tab{flex:none;font-size:12px;padding:6px 10px;}
+  .meal-row{flex-wrap:wrap;gap:8px;}
+  .meal-kcal{min-width:auto;}
+  .btn-primary,.btn-secondary{padding:10px 14px;font-size:12px;}
+  .prog-bar-wrap{width:60px;}
+  .toast{bottom:16px;right:16px;left:16px;text-align:center;}
+  .section-header{flex-direction:column;align-items:flex-start;gap:8px;}
+}
+@media(max-width:480px){
+  .metrics-grid{grid-template-columns:1fr!important;}
+  .content{padding:12px;}
+  .card{padding:12px 14px;margin-bottom:12px;}
+  .metric-value{font-size:20px;}
+  .form-grid,.form-grid-3{grid-template-columns:1fr;}
+  .topbar{padding:10px 14px;}
+  .section-title{font-size:15px;}
+  .ex-table{font-size:11px;}
+  .ex-table th,.ex-table td{padding:6px 6px;white-space:nowrap;}
+  .km-inputs-parc{flex-wrap:wrap;}
+  #parc-inputs{flex-wrap:wrap;}
+  #parc-inputs > div{min-width:calc(33% - 8px);}
+}
+@media(min-width:901px){
+  .hamburger{display:none!important;}
+  .overlay{display:none!important;}
+  .mobile-only{display:none!important;}
+}
+@media(max-width:900px){
+  .desktop-only{display:none!important;}
+  .mobile-only{display:block!important;width:100%!important;}
+  .content{padding:12px!important;}
+  input,select,textarea{max-width:100%!important;box-sizing:border-box!important;}
+  .form-group{width:100%!important;box-sizing:border-box!important;}
+  .card{padding:12px 14px!important;box-sizing:border-box!important;overflow:hidden!important;}
+  .main{box-sizing:border-box!important;overflow-x:hidden!important;}
+  body{overflow-x:hidden!important;}
+}
+</style>
+</head>
+<body data-theme="light">
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg></div>
+    <div class="logo-title">Performance & Wellness</div>
+    <div class="logo-sub">Director personal</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <button class="nav-item active" onclick="showPage('overview',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</button>
+    <button class="nav-item" onclick="showPage('running',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>Running</button>
+    <button class="nav-item" onclick="showPage('spine',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>Salud Espinal</button>
+    <button class="nav-item" onclick="showPage('strength',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43z"/></svg>Plan de Fuerza</button>
+    <div class="nav-section">Nutricion</div>
+    <button class="nav-item" onclick="showPage('nutrition',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-1.96-.81-2.91-1.75-3.84-1.59-1.56-4.03-2.57-6.28-2.57s-4.69 1.01-6.28 2.57c-.94.93-1.75 1.88-1.75 3.84h16.06z"/></svg>Nutricion</button>
+    <div class="nav-section">Mis Datos</div>
+    <button class="nav-item" onclick="showPage('ingresar',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Ingresar datos</button>
+    <div class="nav-section">Acciones</div>
+    <button class="nav-item" onclick="showPage('parciales',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Parciales km</button>
+    <button class="nav-item" onclick="showPage('actions',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Plan de Accion</button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="theme-btn" onclick="toggleTheme()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg><span id="theme-label">Modo oscuro</span></button>
+  </div>
+</aside>
+<div class="toast" id="toast"></div>
+<main class="main">
+  <div class="topbar">
+    <div><div class="topbar-title" id="page-title">Dashboard general</div><div class="topbar-meta" id="topbar-meta">Cargando...</div></div>
+    <div class="topbar-right">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+      <span class="badge badge-green" style="display:none;" id="badge-progreso">En progreso</span>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="page active" id="page-overview">
+      <div class="metrics-grid" id="overview-metrics"></div>
+      <div class="alert"><div class="alert-title">Alertas biomecanicas activas</div><ul class="alert-list"><li>Deficit L4-L5 - sin trabajo de core documentado en historial</li><li>Pie derecho inestable - asimetria de carga 55/45 izquierda/derecha</li><li>Escalada de volumen sin base de fuerza previa (2 km a 6 km)</li><li>Evaluacion de pisada desactualizada - estudios de 2016-17</li></ul></div>
+      <div class="charts-grid">
+        <div class="card"><div class="card-title">Progresion de running - distancia y ritmo</div><div class="legs"><div class="leg"><div class="leg-sq" style="background:#1D9E75;"></div>Distancia (km)</div><div class="leg"><div class="leg-sq" style="background:#BA7517;opacity:.7;"></div>Ritmo (min/km)</div></div><div style="position:relative;height:220px;"><canvas id="runChart"></canvas></div></div>
+        <div class="card"><div class="card-title">Peso corporal - evolucion</div><div style="position:relative;height:260px;"><canvas id="weightChartOv"></canvas></div></div>
+      </div>
+      <div class="charts-2">
+        <div class="card"><div class="card-title">Salud espinal - indicadores clinicos</div>
+          <div class="prog-row"><div class="prog-name">Espacio L4-L5</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:55%;"></div></div><div class="prog-val badge badge-amber">Riesgo</div></div>
+          <div class="prog-row"><div class="prog-name">Lordosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val badge badge-amber">Moderado</div></div>
+          <div class="prog-row"><div class="prog-name">Artrosis (inicio)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:35%;"></div></div><div class="prog-val badge badge-red">Control</div></div>
+          <div class="prog-row"><div class="prog-name">Desalineacion lumbar</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:40%;"></div></div><div class="prog-val badge badge-amber">Leve</div></div>
+          <div class="prog-row"><div class="prog-name">Score postura</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:79%;"></div></div><div class="prog-val badge badge-green">78.5/100</div></div>
+          <div class="prog-row"><div class="prog-name">Score marcha</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:75%;"></div></div><div class="prog-val badge badge-green">75/100</div></div>
+        </div>
+        <div class="card"><div class="card-title">Biomecanica de pisada</div>
+          <div class="prog-row"><div class="prog-name">Pie derecho</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val badge badge-red">Inestable</div></div>
+          <div class="prog-row"><div class="prog-name">Carga lado izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:58%;"></div></div><div class="prog-val badge badge-amber">55-60%</div></div>
+          <div class="prog-row"><div class="prog-name">Propulsion</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val badge badge-amber">Reducida</div></div>
+          <div class="prog-row"><div class="prog-name">Pie izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val badge badge-green">Normal</div></div>
+          <div class="prog-row"><div class="prog-name">Eficiencia marcha</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:52%;"></div></div><div class="prog-val badge badge-amber">Media</div></div>
+          <div class="prog-row"><div class="prog-name">Centro de gravedad</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val badge badge-amber">Compensado</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUNNING -->
+    <div class="page" id="page-running">
+      <div class="section-header"><div><div class="section-title">Historial de running</div><div class="section-sub" id="run-sub">Cargando...</div></div></div>
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);" id="run-metrics"></div>
+      <div class="card" style="margin-bottom:16px;"><div class="card-title">Velocidad por sesion (km/h)</div><div style="position:relative;height:220px;"><canvas id="speedChart"></canvas></div></div>
+      <div class="card"><div class="card-title">Registro completo</div><div class="data-wrap desktop-only"><table class="ex-table"><thead><tr><th>Fecha</th><th>Distancia</th><th>Duracion</th><th>Ritmo</th><th>Velocidad</th><th></th></tr></thead><tbody id="runTable"></tbody></table></div><div class="mobile-only mcrd-list" id="runTableMobile"></div></div>
+    </div>
+
+    <!-- SPINE -->
+    <div class="page" id="page-spine">
+      <div class="section-header"><div><div class="section-title">Salud espinal - analisis clinico</div><div class="section-sub">Basado en espinograma y baropodometria 2016-17</div></div><span class="badge badge-amber">Requiere actualizacion</span></div>
+      <div class="alert"><div class="alert-title">Movimientos prohibidos o a modificar</div><ul class="alert-list"><li>Running de impacto elevado sin calentamiento de core (10 min minimo previo)</li><li>Sentadilla profunda con carga hasta tener evaluacion actualizada</li><li>Ejercicios de hiperextension lumbar (buenos dias, Roman deadlift)</li><li>Impacto repetido en piso duro sin plantillas adecuadas</li><li>Aumentar volumen de km antes de 4 semanas de fuerza base</li></ul></div>
+      <div class="charts-2">
+        <div class="card"><div class="card-title">Columna vertebral</div>
+          <div class="prog-row"><div class="prog-name">Desalineacion lumbar</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:40%;"></div></div><div class="prog-val">Leve</div></div>
+          <div class="prog-row"><div class="prog-name">Desnivel pelvico</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:15%;"></div></div><div class="prog-val">0.2 cm</div></div>
+          <div class="prog-row"><div class="prog-name">Artrosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:30%;"></div></div><div class="prog-val">Incipiente</div></div>
+          <div class="prog-row"><div class="prog-name">Espacio L4-L5</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:55%;"></div></div><div class="prog-val">Disminuido</div></div>
+          <div class="prog-row"><div class="prog-name">Lordosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">Rectificada</div></div>
+        </div>
+        <div class="card"><div class="card-title">Pisada y distribucion de carga</div>
+          <div class="prog-row"><div class="prog-name">Pie derecho (estatica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val">Cavo</div></div>
+          <div class="prog-row"><div class="prog-name">Pie derecho (dinamica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">Plano</div></div>
+          <div class="prog-row"><div class="prog-name">Pie izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val">Normal</div></div>
+          <div class="prog-row"><div class="prog-name">Carga pierna izq.</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:58%;"></div></div><div class="prog-val">55-60%</div></div>
+          <div class="prog-row"><div class="prog-name">Carga pierna der.</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:43%;"></div></div><div class="prog-val">40-45%</div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">Cadena biomecanica compensatoria</div>
+        <div style="padding:16px 0;display:flex;align-items:center;gap:0;flex-wrap:wrap;">
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--red-bg);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Pie derecho inestable</div></div>
+          <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Sobrecarga pierna izq.</div></div>
+          <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Desequilibrio pelvico</div></div>
+          <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--red-bg);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Impacto L4-L5</div></div>
+          <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Contractura cervical refleja</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRENGTH -->
+    <div class="page" id="page-strength">
+      <div class="section-header"><div><div class="section-title">Plan de fuerza funcional</div><div class="section-sub">3 dias por semana - Bajo impacto - Core + estabilidad</div></div></div>
+      <div class="tabs"><button class="tab active" onclick="showTab('bA',this)">Bloque A - Core</button><button class="tab" onclick="showTab('bB',this)">Bloque B - Gluteos</button><button class="tab" onclick="showTab('bC',this)">Bloque C - Pie</button></div>
+      <div id="bA"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="badge badge-blue">20 minutos</span><span style="font-size:13px;color:var(--text2);">Core y estabilidad lumbar - antes de cada sesion de running</span></div>
+        <div class="card"><table class="ex-table"><thead><tr><th>Ejercicio</th><th>Series</th><th>Reps / Tiempo</th><th>Clave tecnica</th></tr></thead><tbody>
+          <tr><td><strong>Dead bug</strong></td><td>3</td><td>8 por lado</td><td>Lumbar pegada al suelo en todo momento</td></tr>
+          <tr><td><strong>Bird dog</strong></td><td>3</td><td>10 por lado</td><td>Cadera nivelada, sin rotacion del tronco</td></tr>
+          <tr><td><strong>Plancha frontal</strong></td><td>3</td><td>30-45 seg</td><td>Evitar hiperextension lumbar</td></tr>
+          <tr><td><strong>Glute bridge</strong></td><td>3</td><td>15 reps</td><td>Apriete de gluteos en el tope, no lumbar</td></tr>
+          <tr><td><strong>Hollow hold</strong></td><td>3</td><td>20 seg</td><td>Zona abdominal activa, no aguantar respiracion</td></tr>
+        </tbody></table></div>
+      </div>
+      <div id="bB" style="display:none;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="badge badge-green">20 minutos</span><span style="font-size:13px;color:var(--text2);">Gluteos y cadera - 3x semana dias alternos</span></div>
+        <div class="card"><table class="ex-table"><thead><tr><th>Ejercicio</th><th>Series</th><th>Reps</th><th>Clave tecnica</th></tr></thead><tbody>
+          <tr><td><strong>Hip thrust en suelo</strong></td><td>3</td><td>12</td><td>Foco en gluteo, no en lumbar</td></tr>
+          <tr><td><strong>Clamshell con banda</strong></td><td>3</td><td>15 por lado</td><td>Trabaja inestabilidad del pie derecho</td></tr>
+          <tr><td><strong>Sentadilla goblet (parcial)</strong></td><td>3</td><td>10</td><td>Solo hasta 60 grados de flexion de rodilla</td></tr>
+          <tr><td><strong>Step-up lateral bajo</strong></td><td>3</td><td>10 por lado</td><td>Escalon de 15-20 cm, control en descenso</td></tr>
+        </tbody></table></div>
+      </div>
+      <div id="bC" style="display:none;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="badge badge-amber">10 minutos</span><span style="font-size:13px;color:var(--text2);">Pie y propiocepcion - realizar diariamente</span></div>
+        <div class="card"><table class="ex-table"><thead><tr><th>Ejercicio</th><th>Series</th><th>Tiempo / Reps</th><th>Nota</th></tr></thead><tbody>
+          <tr><td><strong>Equilibrio monopodal derecho</strong></td><td>3</td><td>30 seg</td><td>Prioridad maxima para pie derecho inestable</td></tr>
+          <tr><td><strong>Elevaciones de talon con apoyo</strong></td><td>3</td><td>15 reps</td><td>Lento en la bajada (3 seg excentrico)</td></tr>
+          <tr><td><strong>Circulos de tobillo</strong></td><td>2</td><td>10 c/direccion</td><td>Movilidad articular preventiva</td></tr>
+          <tr><td><strong>Agarre de toalla con dedos</strong></td><td>3</td><td>15 reps</td><td>Fortalece arco plantar derecho</td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+
+    <!-- NUTRITION -->
+    <div class="page" id="page-nutrition">
+      <div class="section-header"><div><div class="section-title">Plan nutricional antiinflamatorio</div><div class="section-sub">TDEE estimado ~3.380 kcal - Target con deficit 15%: ~2.870 kcal</div></div></div>
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+        <div class="metric"><div class="metric-label">TMB estimada</div><div class="metric-value">2.180</div><div class="metric-delta delta-neu">kcal/dia</div></div>
+        <div class="metric"><div class="metric-label">TDEE (act. mod.)</div><div class="metric-value">3.380</div><div class="metric-delta delta-neu">kcal/dia</div></div>
+        <div class="metric"><div class="metric-label">Target con deficit</div><div class="metric-value">2.870</div><div class="metric-delta delta-pos">kcal/dia (-15%)</div></div>
+        <div class="metric"><div class="metric-label">Perdida estimada</div><div class="metric-value">~0.4</div><div class="metric-delta delta-pos">kg por semana</div></div>
+      </div>
+      <div class="charts-2">
+        <div class="card"><div class="card-title">Plan diario</div>
+          <div class="meal-row"><div class="meal-time">07:00</div><div class="meal-content"><div class="meal-name">Desayuno</div><div class="meal-items">Avena 80g + whey 30g + frutos rojos</div></div><div class="meal-kcal">480 kcal</div></div>
+          <div class="meal-row"><div class="meal-time">10:00</div><div class="meal-content"><div class="meal-name">Pre-entreno</div><div class="meal-items">Banana + almendras 20g</div></div><div class="meal-kcal">220 kcal</div></div>
+          <div class="meal-row"><div class="meal-time">13:00</div><div class="meal-content"><div class="meal-name">Almuerzo</div><div class="meal-items">Pollo/salmon 200g + batata 200g + verduras verdes</div></div><div class="meal-kcal">680 kcal</div></div>
+          <div class="meal-row"><div class="meal-time">16:00</div><div class="meal-content"><div class="meal-name">Merienda</div><div class="meal-items">Yogur griego + nueces 20g</div></div><div class="meal-kcal">280 kcal</div></div>
+          <div class="meal-row"><div class="meal-time">20:00</div><div class="meal-content"><div class="meal-name">Cena</div><div class="meal-items">Huevos 3u + legumbres 150g + aguacate 1/2</div></div><div class="meal-kcal">580 kcal</div></div>
+          <div class="meal-row"><div class="meal-time">Post-run</div><div class="meal-content"><div class="meal-name">Recuperacion</div><div class="meal-items">Whey 25g + fruta</div></div><div class="meal-kcal">250 kcal</div></div>
+          <div style="display:flex;justify-content:flex-end;padding-top:10px;border-top:.5px solid var(--border2);margin-top:6px;"><span style="font-size:14px;font-weight:500;color:var(--text);">Total: ~2.490 kcal</span></div>
+        </div>
+        <div class="card"><div class="card-title">Distribucion de macros</div><div style="position:relative;height:200px;margin-bottom:16px;"><canvas id="macroChart"></canvas></div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:12px;font-weight:500;">Antiinflamatorios clave</div>
+          <div class="prog-row"><span class="dot dot-green" style="margin-right:6px;"></span><div class="prog-name">Omega-3 (salmon, nueces, sardinas)</div><div style="font-size:11px;color:var(--text3);">3x semana</div></div>
+          <div class="prog-row"><span class="dot dot-green" style="margin-right:6px;"></span><div class="prog-name">Curcuma + pimienta negra</div><div style="font-size:11px;color:var(--text3);">Diario</div></div>
+          <div class="prog-row"><span class="dot dot-red" style="margin-right:6px;"></span><div class="prog-name">Ultra-procesados + azucar refinada</div><div style="font-size:11px;color:var(--red);">Evitar</div></div>
+          <div class="prog-row"><span class="dot dot-red" style="margin-right:6px;"></span><div class="prog-name">Alcohol</div><div style="font-size:11px;color:var(--red);">Evitar</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INGRESAR DATOS -->
+    <div class="page" id="page-ingresar">
+      <div class="section-header"><div><div class="section-title">Ingresar datos</div><div class="section-sub">Los datos se guardan automaticamente en este navegador (localStorage)</div></div></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="form-title"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:var(--green);"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></svg>Nueva sesion de running</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Fecha</label><input type="date" id="r-fecha"></div>
+          <div class="form-group"><label>Distancia (km)</label><input type="number" id="r-dist" placeholder="5" step="0.1" min="0"></div>
+          <div class="form-group"><label>Duracion (ej: 0:36:18)</label><input type="text" id="r-dur" placeholder="0:36:18"></div>
+          <div class="form-group"><label>Ritmo medio (ej: 7:15)</label><input type="text" id="r-ritmo" placeholder="7:15"></div>
+        </div>
+        <button class="btn-primary" id="btn-save-run" data-label="Guardar sesion" onclick="saveRun()">Guardar sesion</button>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="form-title"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:var(--blue);"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Registro de peso y medidas</div>
+        <div class="form-grid-3">
+          <div class="form-group"><label>Fecha</label><input type="date" id="w-fecha"></div>
+          <div class="form-group"><label>Peso (kg)</label><input type="number" id="w-peso" placeholder="102.8" step="0.1" min="0"></div>
+          <div class="form-group"><label>Altura (m)</label><input type="number" id="w-altura" placeholder="1.88" step="0.01" min="1" max="2.5" value="1.88"></div>
+          <div class="form-group"><label>Cintura (m) - opcional</label><input type="number" id="w-cintura" placeholder="1.03" step="0.01" min="0"></div>
+          <div class="form-group"><label>Cadera (m) - opcional</label><input type="number" id="w-cadera" placeholder="1.15" step="0.01" min="0"></div>
+          <div class="form-group"><label>Cuello (m) - opcional</label><input type="number" id="w-cuello" placeholder="0.38" step="0.01" min="0"></div>
+        </div>
+        <button class="btn-primary" id="btn-save-weight" data-label="Guardar medidas" onclick="saveWeight()">Guardar medidas</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Sesiones registradas</div>
+        <div class="data-wrap desktop-only"><table class="ex-table"><thead><tr><th>Fecha</th><th>Distancia</th><th>Duracion</th><th>Ritmo</th><th>Velocidad</th><th></th></tr></thead><tbody id="runTableData"></tbody></table></div><div class="mobile-only mcrd-list" id="runTableDataMobile"></div>
+        <div style="margin-top:20px;"><div class="card-title">Registros de peso</div>
+        <div class="data-wrap desktop-only"><table class="ex-table"><thead><tr><th>Fecha</th><th>Peso (kg)</th><th>IMC</th><th>Cintura</th><th>Cadera</th><th></th></tr></thead><tbody id="weightTableData"></tbody></table></div><div class="mobile-only mcrd-list" id="weightTableDataMobile"></div></div>
+        <div style="margin-top:20px;padding-top:16px;border-top:.5px solid var(--border);">
+          <div style="background:var(--surface2);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="color:var(--green);flex-shrink:0;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;">Conectado a Google Sheets</div>
+              <div id="sync-status" style="font-size:12px;color:var(--text3);">Cargando...</div>
+            </div>
+            <button class="btn-secondary" onclick="loadFromSheets()" style="font-size:12px;padding:6px 12px;">Sincronizar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARCIALES -->
+    <div class="page" id="page-parciales">
+      <div class="section-header"><div><div class="section-title">Parciales por km</div><div class="section-sub" id="parc-sub">Detalle de cada km por sesion</div></div></div>
+
+      <!-- Formulario nueva sesion con parciales -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="form-title"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="color:var(--blue);"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Cargar nueva sesion con parciales</div>
+        <div class="form-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));">
+          <div class="form-group"><label>Fecha</label><input type="date" id="p-fecha"></div>
+          <div class="form-group"><label>Distancia (km)</label>
+            <select id="p-dist" onchange="buildParciales()" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none;">
+              <option value="2">2 km</option><option value="3">3 km</option>
+              <option value="5" selected>5 km</option><option value="6">6 km</option>
+              <option value="7">7 km</option><option value="8">8 km</option><option value="10">10 km</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Duracion total (ej: 36:18)</label><input type="text" id="p-dur" placeholder="36:18"></div>
+          <div class="form-group"><label>Ritmo medio (ej: 7:15)</label><input type="text" id="p-ritmo" placeholder="7:15"></div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Parciales por km (mm:ss)</div>
+          <div id="parc-inputs" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;"></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-primary" id="btn-save-parc" data-label="Guardar sesion" onclick="saveParciales()">Guardar sesion</button>
+          <button class="btn-secondary" onclick="clearParcForm()">Limpiar</button>
+        </div>
+      </div>
+
+      <!-- Métricas globales -->
+      <div id="parc-metrics" style="margin-bottom:16px;"></div>
+
+      <!-- Tabla de sesiones con parciales -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">Historial de sesiones</div>
+        <div class="data-wrap desktop-only"><table class="ex-table" id="parc-table">
+          <thead id="parc-thead"></thead>
+          <tbody id="parc-tbody"></tbody>
+        </table></div>
+        <div class="mobile-only mcrd-list" id="parc-mobile-list"></div>
+      </div>
+
+      <!-- Gráficos -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">Evolución del ritmo promedio</div>
+        <div style="position:relative;height:220px;"><canvas id="parcChart"></canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">Amplitud por sesión (mejor vs peor km)</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Verde ≤30s · Amarillo ≤60s · Rojo >60s</div>
+        <div style="position:relative;height:200px;"><canvas id="parcAmpChart"></canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">Evolución del mejor km por sesión</div>
+        <div style="position:relative;height:200px;"><canvas id="parcKmChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="page" id="page-actions">
+      <div class="section-header"><div><div class="section-title">Plan de accion</div><div class="section-sub">Hoja de ruta preventiva - ordenada por urgencia</div></div></div>
+      <div class="card" style="margin-bottom:16px;"><div class="card-title">Acciones inmediatas</div>
+        <div class="action-row"><div><div class="action-name">Iniciar Bloque A del plan de fuerza</div><div class="action-sub">Dead bug, bird dog, plancha, glute bridge - antes de cualquier sesion de running</div></div><span class="badge badge-red">Esta semana</span></div>
+        <div class="action-row"><div><div class="action-name">No incrementar volumen de km</div><div class="action-sub">Mantener 6 km con ritmo 6:50-7:00 min/km hasta tener 4 semanas de fuerza</div></div><span class="badge badge-red">Inmediato</span></div>
+        <div class="action-row"><div><div class="action-name">Revisar calzado - desgaste lateral</div><div class="action-sub">Controlar suela por supinacion parcial documentada</div></div><span class="badge badge-red">Esta semana</span></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;"><div class="card-title">Proximas 2-4 semanas</div>
+        <div class="action-row"><div><div class="action-name">Turno con traumatologo</div><div class="action-sub">Evaluacion de pisada actualizada - estudios de 2016-17 ya no son validos</div></div><span class="badge badge-amber">15 dias</span></div>
+        <div class="action-row"><div><div class="action-name">Incorporar Bloque B y C al plan</div><div class="action-sub">Gluteos, cadera y propiocepcion de pie derecho</div></div><span class="badge badge-amber">Semana 2</span></div>
+        <div class="action-row"><div><div class="action-name">Implementar plan nutricional</div><div class="action-sub">Target ~2.490 kcal, priorizar antiinflamatorios y omega-3</div></div><span class="badge badge-amber">Esta semana</span></div>
+      </div>
+      <div class="card"><div class="card-title">30-60 dias</div>
+        <div class="action-row"><div><div class="action-name">Plantillas personalizadas</div><div class="action-sub">Con datos de nueva evaluacion de pisada</div></div><span class="badge badge-blue">30 dias</span></div>
+        <div class="action-row"><div><div class="action-name">Control traumatologico de seguimiento</div><div class="action-sub">Evaluar progreso y autorizar incremento de km</div></div><span class="badge badge-blue">60 dias</span></div>
+        <div class="action-row"><div><div class="action-name">Progresion a 8 km</div><div class="action-sub">Solo si base de fuerza consolidada y pisada corregida</div></div><span class="badge badge-green">60-90 dias</span></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+<script>
+const API='https://script.google.com/macros/s/AKfycbwTJdv89ffUFXMwlZInVp-SreQXiPWzIz7MMZoUDOPxJjwhSFAW-kBBj-gMadi_LxIz/exec';
+let DB={runs:[],weights:[],parciales:[]};
+
+function setStatus(msg,color){
+  const el=document.getElementById('sync-status');
+  if(el){el.textContent=msg;el.style.color=color||'var(--text3)';}
+  document.getElementById('topbar-meta').textContent=msg;
+}
+
+async function gsGet(){
+  const res=await fetch(API+'?action=read');
+  return await res.json();
+}
+async function gsPost(body){
+  const res=await fetch(API,{method:'POST',body:JSON.stringify(body)});
+  return await res.json();
+}
+function parseNum(v){return parseFloat(String(v).replace(',','.').trim())||0;}
+async function loadFromSheets(){
+  setStatus('Conectando con Google Sheets...','var(--amber)');
+  try{
+    const data=await gsGet();
+    DB.runs=(data.runs||[]).map(r=>({...r,dist:parseNum(r.dist),vel:parseNum(r.vel)}));
+    DB.weights=(data.weights||[]).map(w=>({...w,peso:parseNum(w.peso),altura:parseNum(w.altura),cintura:w.cintura?parseNum(w.cintura):null,cadera:w.cadera?parseNum(w.cadera):null,cuello:w.cuello?parseNum(w.cuello):null}));
+    DB.parciales=(data.parciales||[]).map(p=>({...p,dist:parseNum(p.dist),vel:parseNum(p.vel)}));
+    sortR();sortW();sortP();
+    setStatus('Sincronizado - '+new Date().toLocaleTimeString(),'var(--green)');
+    renderAll();
+    setTimeout(renderParcialesPage, 300);
+  }catch(e){
+    setStatus('Error de conexion - verificá tu internet','var(--red)');
+  }
+}
+
+function parseDate(s){
+  if(!s)return new Date(0);
+  s=String(s).trim();
+  // yyyy-mm-dd
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return new Date(parseInt(m[1]),parseInt(m[2])-1,parseInt(m[3]));
+  // dd/mm/yyyy
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m)return new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));
+  // dd/mm/yy
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+  if(m)return new Date(2000+parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));
+  return new Date(s);
+}
+function sortR(){DB.runs.sort((a,b)=>parseDate(a.fecha)-parseDate(b.fecha));}
+function sortW(){DB.weights.sort((a,b)=>parseDate(a.fecha)-parseDate(b.fecha));}
+const MS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+function fd(iso){
+  if(!iso||iso==='-')return '-';
+  const s=String(iso).trim();
+  // yyyy-mm-dd
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return `${parseInt(m[3])} ${MS[parseInt(m[2])-1]} ${m[1].slice(2)}`;
+  // dd/mm/yyyy
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m)return `${parseInt(m[1])} ${MS[parseInt(m[2])-1]} ${m[3].slice(2)}`;
+  // dd/mm/yy
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+  if(m)return `${parseInt(m[1])} ${MS[parseInt(m[2])-1]} ${m[3]}`;
+  return s;
+}
+function rtn(r){if(!r)return 0;const rs=String(r).trim();if(!rs.includes(':'))return 0;const p=rs.split(':');return parseFloat(p[0])+parseFloat(p[1])/60;}
+function cv(dist,dur){if(!dist||!dur)return 0;const p=dur.split(':');let s=0;if(p.length===3)s=parseInt(p[0])*3600+parseInt(p[1])*60+parseInt(p[2]);else if(p.length===2)s=parseInt(p[0])*60+parseInt(p[1]);if(!s)return 0;return Math.round((dist/(s/3600))*100)/100;}
+function imc(p,a){return Math.round((p/(a*a))*100)/100;}
+function dk(){return document.documentElement.getAttribute('data-theme')==='dark';}
+function gc(){return dk()?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';}
+function tc(){return dk()?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.40)';}
+function toast(msg,dur=2400){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+let CH={};
+function killCharts(){Object.values(CH).forEach(c=>{try{c.destroy();}catch(e){}});CH={};}
+function initCharts(){
+  killCharts();sortR();sortW();
+  const runs=DB.runs;const wts=DB.weights;
+  const lbl=runs.map(r=>fd(r.fecha));
+  const rnums=runs.map(r=>rtn(r.ritmo));
+  const rc=document.getElementById('runChart');
+  if(rc)CH.r=new Chart(rc,{type:'line',data:{labels:lbl,datasets:[{label:'km',data:runs.map(r=>r.dist),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.10)',yAxisID:'y',tension:.35,pointRadius:4,pointBackgroundColor:'#1D9E75',fill:true},{label:'ritmo',data:rnums,borderColor:'#BA7517',backgroundColor:'transparent',yAxisID:'y2',tension:.35,pointRadius:4,pointBackgroundColor:'#BA7517',borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?`${ctx.parsed.y} km`:`Ritmo: ${ctx.parsed.y.toFixed(2)} min/km`}}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40,autoSkip:false},grid:{color:gc()}},y:{position:'left',ticks:{color:'#1D9E75',font:{size:10}},grid:{color:gc()},title:{display:true,text:'km',color:'#1D9E75',font:{size:10}},min:0},y2:{position:'right',ticks:{color:'#BA7517',font:{size:10}},grid:{display:false},title:{display:true,text:'min/km',color:'#BA7517',font:{size:10}},reverse:true}}}});
+  const wc=document.getElementById('weightChartOv');
+  if(wc)CH.w=new Chart(wc,{type:'line',data:{labels:wts.map(w=>fd(w.fecha)),datasets:[{label:'Peso',data:wts.map(w=>w.peso),borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.10)',tension:.3,pointRadius:4,pointBackgroundColor:'#378ADD',fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{color:gc()}},y:{ticks:{color:tc(),font:{size:10}},grid:{color:gc()}}}}});
+  const sc=document.getElementById('speedChart');
+  if(sc)CH.s=new Chart(sc,{type:'bar',data:{labels:lbl,datasets:[{label:'vel',data:runs.map(r=>r.vel),backgroundColor:runs.map(r=>r.vel>=8.5?'#1D9E75':r.vel>=8.2?'#BA7517':'#888780'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y.toFixed(2)} km/h`}}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40,autoSkip:false},grid:{color:gc()}},y:{ticks:{color:tc(),font:{size:10}},grid:{color:gc()},min:7}}}});
+  const mc=document.getElementById('macroChart');
+  if(mc)CH.m=new Chart(mc,{type:'doughnut',data:{labels:['Proteinas 30%','Carbohidratos 45%','Grasas 25%'],datasets:[{data:[30,45,25],backgroundColor:['#1D9E75','#378ADD','#BA7517'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}});
+}
+
+function renderOvMetrics(){
+  sortR();sortW();const runs=DB.runs;const wts=DB.weights;
+  if(!runs.length||!wts.length){document.getElementById('overview-metrics').innerHTML='<div class="empty-state">Cargando datos desde Google Sheets...</div>';return;}
+  const lR=runs[runs.length-1];const lW=wts[wts.length-1];const fW=wts[0];
+  const bR=runs.reduce((b,r)=>rtn(r.ritmo)<rtn(b.ritmo)?r:b,runs[0]);
+  const mD=runs.reduce((b,r)=>r.dist>b.dist?r:b,runs[0]);
+  const mV=runs.reduce((b,r)=>r.vel>b.vel?r:b,runs[0]);
+  const pd=(lW.peso-fW.peso).toFixed(1);
+  const in_=imc(parseFloat(lW.peso),parseFloat(lW.altura));const if_=imc(parseFloat(fW.peso),parseFloat(fW.altura));
+  document.getElementById('overview-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Peso actual</div><div class="metric-value">${parseFloat(lW.peso)||0} <span style="font-size:14px;color:var(--text2)">kg</span></div><div class="metric-delta ${pd<0?'delta-pos':'delta-neg'}">${pd<0?'&#8595;':'&#8593;'} ${Math.abs(pd)} kg desde inicio</div></div>
+    <div class="metric"><div class="metric-label">IMC</div><div class="metric-value">${in_}</div><div class="metric-delta ${in_<if_?'delta-pos':'delta-neg'}">${in_<if_?'&#8595;':'&#8593;'} ${Math.abs((in_-if_).toFixed(2))} pts</div></div>
+    <div class="metric"><div class="metric-label">Mejor ritmo</div><div class="metric-value">${bR.ritmo} <span style="font-size:14px;color:var(--text2)">min/km</span></div><div class="metric-delta delta-pos">desde ${runs[0].ritmo}</div></div>
+    <div class="metric"><div class="metric-label">Distancia max</div><div class="metric-value">${parseFloat(mD.dist)||0} <span style="font-size:14px;color:var(--text2)">km</span></div><div class="metric-delta delta-pos">desde ${runs[0].dist} km</div></div>
+    <div class="metric"><div class="metric-label">Velocidad max</div><div class="metric-value">${(parseFloat(mV.vel)||0).toFixed(2)} <span style="font-size:14px;color:var(--text2)">km/h</span></div><div class="metric-delta delta-pos">+${((mV.vel-runs[0].vel)/runs[0].vel*100).toFixed(1)}%</div></div>
+    <div class="metric"><div class="metric-label">Sesiones</div><div class="metric-value">${runs.length}</div><div class="metric-delta delta-neu">registradas</div></div>`;
+}
+function renderRunPage(){
+  sortR();const runs=DB.runs;
+  document.getElementById('run-sub').textContent=`${runs.length} sesiones registradas`;
+  if(!runs.length){document.getElementById('run-metrics').innerHTML='';document.getElementById('runTable').innerHTML='<tr><td colspan="6" class="empty-state">Sin sesiones aun</td></tr>';return;}
+  const bR=runs.reduce((b,r)=>rtn(r.ritmo)<rtn(b.ritmo)?r:b,runs[0]);
+  const mV=runs.reduce((b,r)=>r.vel>b.vel?r:b,runs[0]);
+  const mD=runs.reduce((b,r)=>r.dist>b.dist?r:b,runs[0]);
+  document.getElementById('run-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Sesiones</div><div class="metric-value">${runs.length}</div><div class="metric-delta delta-neu">registradas</div></div>
+    <div class="metric"><div class="metric-label">Mejor ritmo</div><div class="metric-value">${bR.ritmo}</div><div class="metric-delta delta-pos">min/km</div></div>
+    <div class="metric"><div class="metric-label">Velocidad max</div><div class="metric-value">${(parseFloat(mV.vel)||0).toFixed(2)}</div><div class="metric-delta delta-pos">km/h</div></div>
+    <div class="metric"><div class="metric-label">Distancia max</div><div class="metric-value">${mD.dist} km</div><div class="metric-delta delta-pos">registrada</div></div>`;
+  document.getElementById('runTable').innerHTML=runs.map((r,i)=>`<tr>
+    <td>${fd(r.fecha)}</td><td>${r.dist} km</td><td>${r.dur}</td>
+    <td>${r.ritmo} min/km</td><td>${r.vel.toFixed(2)} km/h</td>
+    <td><button class="btn-del" onclick="delRun('${r.fecha}')">X</button></td>
+  </tr>`).join('');
+  // Mobile card list
+  const rmcEl=document.getElementById('runTableMobile');
+  if(rmcEl) rmcEl.innerHTML=runs.map(r=>`
+    <div class="mcrd-item">
+      <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(r.fecha)}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Distancia</span><span class="mcrd-val">${r.dist} km</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Duración</span><span class="mcrd-val">${r.dur}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Ritmo</span><span class="mcrd-val">${r.ritmo} min/km</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Velocidad</span><span class="mcrd-val">${r.vel.toFixed(2)} km/h</span></div>
+      <div class="mcrd-actions"><button class="btn-del" onclick="delRun('${r.fecha}')">Eliminar</button></div>
+    </div>`).join('');
+}
+function renderDataTables(){
+  sortR();sortW();const runs=DB.runs;const wts=DB.weights;
+  const rtEl=document.getElementById('runTableData');
+  rtEl.innerHTML=runs.length?runs.map(r=>`<tr>
+    <td>${fd(r.fecha)}</td><td>${r.dist} km</td><td>${r.dur}</td>
+    <td>${r.ritmo} min/km</td><td>${r.vel.toFixed(2)} km/h</td>
+    <td><button class="btn-del" onclick="delRun('${r.fecha}')">X</button></td>
+  </tr>`).join(''):'<tr><td colspan="6" class="empty-state">Sin sesiones aun</td></tr>';
+  const rtmEl=document.getElementById('runTableDataMobile');
+  if(rtmEl) rtmEl.innerHTML=runs.length?runs.map(r=>`
+    <div class="mcrd-item">
+      <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(r.fecha)}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Distancia</span><span class="mcrd-val">${r.dist} km</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Duración</span><span class="mcrd-val">${r.dur}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Ritmo</span><span class="mcrd-val">${r.ritmo} min/km</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Velocidad</span><span class="mcrd-val">${r.vel.toFixed(2)} km/h</span></div>
+      <div class="mcrd-actions"><button class="btn-del" onclick="delRun('${r.fecha}')">Eliminar</button></div>
+    </div>`).join(''):'<div class="empty-state">Sin sesiones aun</div>';
+  const wtEl=document.getElementById('weightTableData');
+  wtEl.innerHTML=wts.length?wts.map(w=>`<tr>
+    <td>${fd(w.fecha)}</td><td>${w.peso} kg</td><td>${imc(w.peso,w.altura)}</td>
+    <td>${w.cintura||'-'}</td><td>${w.cadera||'-'}</td>
+    <td><button class="btn-del" onclick="delW('${w.fecha}')">X</button></td>
+  </tr>`).join(''):'<tr><td colspan="6" class="empty-state">Sin registros aun</td></tr>';
+  const wtmEl=document.getElementById('weightTableDataMobile');
+  if(wtmEl) wtmEl.innerHTML=wts.length?wts.map(w=>`
+    <div class="mcrd-item">
+      <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(w.fecha)}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Peso</span><span class="mcrd-val">${w.peso} kg</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">IMC</span><span class="mcrd-val">${imc(w.peso,w.altura)}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Cintura</span><span class="mcrd-val">${w.cintura||'-'}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">Cadera</span><span class="mcrd-val">${w.cadera||'-'}</span></div>
+      <div class="mcrd-actions"><button class="btn-del" onclick="delW('${w.fecha}')">Eliminar</button></div>
+    </div>`).join(''):'<div class="empty-state">Sin registros aun</div>';
+}
+function renderAll(){renderOvMetrics();renderRunPage();renderDataTables();renderParcialesPage();initCharts();}
+
+// ── PARCIALES ──────────────────────────────────────────────────────────────
+function sortP(){DB.parciales.sort((a,b)=>parseDate(a.fecha)-parseDate(b.fecha));}
+
+function toSecs(s){if(!s||!String(s).includes(':'))return null;const p=String(s).trim().split(':');return parseInt(p[0])*60+parseInt(p[1]);}
+function fmtSecs(s){if(!s&&s!==0)return '-';return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');}
+
+function buildParciales(){
+  const n=parseInt(document.getElementById('p-dist').value);
+  const c=document.getElementById('parc-inputs');c.innerHTML='';
+  for(let i=1;i<=n;i++){
+    c.innerHTML+=`<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:70px;flex:1;">
+      <label style="font-size:10px;color:var(--text3);">km ${i}</label>
+      <input type="text" id="pkm${i}" placeholder="7:15" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--radius);padding:8px 6px;font-size:13px;color:var(--text);font-family:inherit;outline:none;width:100%;text-align:center;">
+    </div>`;
+  }
+}
+
+function clearParcForm(){
+  document.getElementById('p-dur').value='';
+  document.getElementById('p-ritmo').value='';
+  buildParciales();
+}
+
+async function saveParciales(){
+  const f=document.getElementById('p-fecha').value;
+  const dist=parseInt(document.getElementById('p-dist').value);
+  const dur=document.getElementById('p-dur').value.trim();
+  const ritmo=document.getElementById('p-ritmo').value.trim();
+  if(!f||!dist||!dur||!ritmo){toast('Completa fecha, duración y ritmo');return;}
+  const kms=[];
+  for(let i=1;i<=dist;i++){kms.push((document.getElementById('pkm'+i)||{}).value||'');}
+  const entry={fecha:f,dist,dur,ritmo,vel:cv(dist,dur),kms};
+  setBtnLoading('btn-save-parc',true);
+  setStatus('Guardando parciales en Google Sheets...','var(--amber)');
+  try{
+    await gsPost({action:'saveParciales',entry});
+    DB.parciales.push(entry);sortP();
+    // also add to runs if not already there
+    if(!DB.runs.find(r=>r.fecha===f)){
+      const run={fecha:f,dist,dur,ritmo,vel:cv(dist,dur)};
+      await gsPost({action:'saveRun',run});
+      DB.runs.push(run);sortR();
+    }
+    renderAll();
+    clearParcForm();
+    setStatus('Guardado - '+new Date().toLocaleTimeString(),'var(--green)');
+    toast('Sesion con parciales guardada!');
+  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  setBtnLoading('btn-save-parc',false);
+}
+
+async function delParciales(fecha){
+  if(!confirm('Eliminar esta sesion?'))return;
+  try{
+    await gsPost({action:'deleteParciales',fecha});
+    DB.parciales=DB.parciales.filter(p=>p.fecha!==fecha);
+    renderAll();toast('Sesion eliminada');
+  }catch(e){toast('Error al eliminar');}
+}
+
+function stdDev(arr){if(arr.length<2)return 0;const m=arr.reduce((a,b)=>a+b,0)/arr.length;return Math.sqrt(arr.map(x=>(x-m)**2).reduce((a,b)=>a+b,0)/arr.length);}
+function negSplit(kms){const s=kms.map(k=>toSecs(k)).filter(Boolean);if(s.length<2)return null;const half=Math.floor(s.length/2);const first=s.slice(0,half).reduce((a,b)=>a+b,0)/half;const last=s.slice(-half).reduce((a,b)=>a+b,0)/half;return first-last;}
+function renderParcialesPage(){
+  sortP();
+  const entries=DB.parciales;
+  document.getElementById('parc-sub').textContent=`${entries.length} sesiones · ${entries.reduce((a,e)=>a+(parseNum(e.dist)||0),0)} km totales`;
+  const maxKm=entries.length?Math.max(...entries.map(e=>parseInt(e.dist)||0)):6;
+  const allRitmos=entries.map(e=>rtn(e.ritmo)).filter(Boolean);
+  const bestRitmo=allRitmos.length?Math.min(...allRitmos):null;
+  const lastRitmo=allRitmos.length?allRitmos[allRitmos.length-1]:null;
+  const prevRitmo=allRitmos.length>1?allRitmos[allRitmos.length-2]:null;
+  const mejora=prevRitmo&&lastRitmo?prevRitmo-lastRitmo:null;
+  const allAmps=entries.map(e=>{const s=Array.isArray(e.kms)?e.kms.map(k=>toSecs(k)).filter(Boolean):[];return s.length>1?Math.max(...s)-Math.min(...s):null;}).filter(v=>v!==null);
+  const avgAmp=allAmps.length?Math.round(allAmps.reduce((a,b)=>a+b,0)/allAmps.length):null;
+  const lastAmp=allAmps.length?allAmps[allAmps.length-1]:null;
+  const negSplits=entries.filter(e=>{const ns=negSplit(Array.isArray(e.kms)?e.kms:[]);return ns&&ns>0;}).length;
+  const negSplitPct=entries.length?Math.round(negSplits/entries.length*100):0;
+  const allKmSecs=entries.flatMap(e=>Array.isArray(e.kms)?e.kms:[]).map(k=>toSecs(k)).filter(Boolean);
+  const bestKmEver=allKmSecs.length?Math.min(...allKmSecs):null;
+  const freqDays=(()=>{if(entries.length<2)return null;const first=parseDate(entries[0].fecha),last=parseDate(entries[entries.length-1].fecha);const days=Math.round((last-first)/(1000*60*60*24));return Math.round(days/entries.length);})();
+
+  document.getElementById('parc-metrics').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px;">
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Mejor ritmo histórico</div>
+        <div style="font-size:20px;font-weight:500;color:var(--green);">${bestRitmo?fmtSecs(Math.round(bestRitmo*60)):'-'}</div>
+        <div style="font-size:11px;color:var(--text3);">min/km</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Último vs anterior</div>
+        <div style="font-size:20px;font-weight:500;color:${mejora&&mejora>0?'var(--green)':'var(--amber)'};">${mejora?((mejora>0?'▲ ':'▼ ')+Math.abs(Math.round(mejora*60))+'s'):'-'}</div>
+        <div style="font-size:11px;color:var(--text3);">${mejora?(mejora>0?'más rápido':'más lento'):''}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Amplitud promedio</div>
+        <div style="font-size:20px;font-weight:500;">${avgAmp!==null?fmtSecs(avgAmp):'-'}</div>
+        <div style="font-size:11px;color:var(--text3);">última: ${lastAmp!==null?fmtSecs(lastAmp):'-'}</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Negative split</div>
+        <div style="font-size:20px;font-weight:500;color:${negSplitPct>=50?'var(--green)':'var(--amber)'};">${negSplitPct}%</div>
+        <div style="font-size:11px;color:var(--text3);">sesiones con 2ª mitad más rápida</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Km más rápido histórico</div>
+        <div style="font-size:20px;font-weight:500;color:var(--green);">${bestKmEver?fmtSecs(bestKmEver):'-'}</div>
+        <div style="font-size:11px;color:var(--text3);">min/km</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Frecuencia</div>
+        <div style="font-size:20px;font-weight:500;">${freqDays?freqDays+' días':'-'}</div>
+        <div style="font-size:11px;color:var(--text3);">entre salidas (promedio)</div>
+      </div>
+    </div>`;
+
+  let thHtml='<tr><th>Fecha</th><th>km</th><th>Ritmo</th>';
+  for(let i=1;i<=maxKm;i++) thHtml+=`<th>km ${i}</th>`;
+  thHtml+='<th>Mejor</th><th>Peor</th><th>Amplitud</th><th>Desv.</th><th>Split</th><th></th></tr>';
+  document.getElementById('parc-thead').innerHTML=thHtml;
+  document.getElementById('parc-table').className='ex-table mobile-card-table';
+
+  // Mobile card list for parciales
+  const parcMobile = document.getElementById('parc-mobile-list');
+
+  if(!entries.length){
+    document.getElementById('parc-tbody').innerHTML=`<tr><td colspan="${maxKm+10}" class="empty-state">Sin sesiones con parciales aun</td></tr>`;
+    if(parcMobile) parcMobile.innerHTML='<div class="empty-state">Sin sesiones con parciales aun</div>';
+  } else {
+    document.getElementById('parc-tbody').innerHTML=entries.map(e=>{
+      const kms=Array.isArray(e.kms)?e.kms:(e.kms?String(e.kms).split(','):[]);
+      const secsArr=kms.map(k=>toSecs(k)).filter(Boolean);
+      const best=secsArr.length?Math.min(...secsArr):null;
+      const worst=secsArr.length>1?Math.max(...secsArr):null;
+      const amp=best&&worst?worst-best:null;
+      const sd=secsArr.length>1?Math.round(stdDev(secsArr)):null;
+      const ns=negSplit(kms);
+      const nsLabel=ns===null?'-':ns>5?'✅ Neg':ns<-5?'⚠️ Pos':'≈ Par';
+      const nsColor=ns===null?'':ns>5?'var(--green)':ns<-5?'var(--amber)':'var(--text2)';
+      let kmCells='';
+      for(let i=0;i<maxKm;i++){
+        const v=kms[i]||'';const s=toSecs(v);
+        let style='';
+        if(s&&s===best) style='background:var(--green-bg);color:var(--green-text);font-weight:500;border-radius:4px;padding:2px 5px;';
+        else if(s&&s===worst) style='background:var(--amber-bg);color:var(--amber-text);border-radius:4px;padding:2px 5px;';
+        kmCells+=`<td><span style="${style}">${v||'—'}</span></td>`;
+      }
+      return `<tr>
+        <td>${fd(e.fecha)}</td><td>${e.dist}km</td><td>${e.ritmo||'-'}</td>
+        ${kmCells}
+        <td><span style="background:var(--green-bg);color:var(--green-text);border-radius:4px;padding:2px 5px;font-size:11px;">${best?fmtSecs(best):'-'}</span></td>
+        <td><span style="background:var(--amber-bg);color:var(--amber-text);border-radius:4px;padding:2px 5px;font-size:11px;">${worst?fmtSecs(worst):'-'}</span></td>
+        <td style="font-size:12px;">${amp!==null?fmtSecs(amp):'-'}</td>
+        <td style="font-size:12px;color:var(--text2);">${sd!==null?sd+'s':'-'}</td>
+        <td style="font-size:11px;color:${nsColor};font-weight:500;">${nsLabel}</td>
+        <td style="display:flex;gap:4px;"><button class="btn-analyze" onclick="analizarSesion('${e.fecha}',this)">🔍</button><button class="btn-del" onclick="delParciales('${e.fecha}')">X</button></td>
+      </tr>
+      <tr id="analysis-${e.fecha}" style="display:none;" class="analysis-row"><td colspan="${maxKm+10}"><div class="analysis-box analysis-loading">Analizando sesión...</div></td></tr>`;
+    }).join('');
+
+    // Mobile cards for parciales
+    if(parcMobile) parcMobile.innerHTML = entries.map(e=>{
+      const kms=Array.isArray(e.kms)?e.kms:String(e.kms).split(',');
+      const secsArr=kms.map(k=>toSecs(k)).filter(Boolean);
+      const best=secsArr.length?Math.min(...secsArr):null;
+      const worst=secsArr.length>1?Math.max(...secsArr):null;
+      const amp=best&&worst?worst-best:null;
+      const ns=negSplit(kms);
+      const nsLabel=ns===null?'-':ns>5?'✅ Neg':ns<-5?'⚠️ Pos':'≈ Par';
+      const pills=kms.filter(v=>v&&v.trim()).map((v,ki)=>{
+        const s=toSecs(v);
+        let cls='parc-pill';
+        if(s&&s===best) cls='parc-pill best';
+        else if(s&&s===worst) cls='parc-pill worst';
+        return `<span class="${cls}">km${ki+1}: ${v}</span>`;
+      }).join('');
+      return `<div class="mcrd-item">
+        <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(e.fecha)}</span></div>
+        <div class="mcrd-row"><span class="mcrd-label">Distancia</span><span class="mcrd-val">${e.dist} km</span></div>
+        <div class="mcrd-row"><span class="mcrd-label">Ritmo</span><span class="mcrd-val">${e.ritmo||'-'} min/km</span></div>
+        <div style="padding:6px 0;font-size:11px;"><div class="mcrd-label" style="margin-bottom:6px;">Parciales</div><div class="parc-pills">${pills}</div></div>
+        <div class="mcrd-row">
+          <span class="mcrd-label">Mejor · Peor</span>
+          <span class="mcrd-val"><span style="background:var(--green-bg);color:var(--green-text);border-radius:4px;padding:2px 6px;font-size:12px;margin-right:4px;">${best?fmtSecs(best):'-'}</span><span style="background:var(--amber-bg);color:var(--amber-text);border-radius:4px;padding:2px 6px;font-size:12px;">${worst?fmtSecs(worst):'-'}</span></span>
+        </div>
+        <div class="mcrd-row"><span class="mcrd-label">Amplitud</span><span class="mcrd-val">${amp!==null?fmtSecs(amp):'-'}</span></div>
+        <div class="mcrd-row"><span class="mcrd-label">Split</span><span class="mcrd-val">${nsLabel}</span></div>
+        <div class="mcrd-actions">
+          <button class="btn-analyze" onclick="analizarSesionMobile('${e.fecha}',this)">🔍 Analizar</button>
+          <button class="btn-del" onclick="delParciales('${e.fecha}')">Eliminar</button>
+        </div>
+        <div id="analysis-m-${e.fecha}" style="display:none;margin-top:10px;padding-top:10px;border-top:.5px solid var(--border);font-size:13px;line-height:1.6;"></div>
+      </div>`;
+    }).join('');
+  }
+
+  if(CH.parc){try{CH.parc.destroy();}catch(e){}}
+  if(CH.parcAmp){try{CH.parcAmp.destroy();}catch(e){}}
+  if(CH.parcKm){try{CH.parcKm.destroy();}catch(e){}}
+  const labels=entries.map(e=>fd(e.fecha));
+  const ritmos=entries.map(e=>rtn(e.ritmo));
+  const amps=entries.map(e=>{const s=Array.isArray(e.kms)?e.kms.map(k=>toSecs(k)).filter(Boolean):[];return s.length>1?Math.round(Math.max(...s)-Math.min(...s)):null;});
+  const pc=document.getElementById('parcChart');
+  if(pc&&entries.length){CH.parc=new Chart(pc,{type:'line',data:{labels,datasets:[{label:'Ritmo prom',data:ritmos,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.10)',tension:.35,pointRadius:5,pointBackgroundColor:'#1D9E75',fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Ritmo: ${fmtSecs(Math.round(ctx.parsed.y*60))}`}}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{color:gc()}},y:{reverse:true,ticks:{color:tc(),font:{size:10},callback:v=>fmtSecs(Math.round(v*60))},grid:{color:gc()},title:{display:true,text:'min/km',color:tc(),font:{size:10}}}}}});}
+  const pa=document.getElementById('parcAmpChart');
+  if(pa&&entries.length){CH.parcAmp=new Chart(pa,{type:'bar',data:{labels,datasets:[{label:'Amplitud',data:amps,backgroundColor:amps.map(a=>a!==null&&a<=30?'rgba(29,158,117,0.7)':a!==null&&a<=60?'rgba(245,158,11,0.7)':'rgba(239,68,68,0.7)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Amplitud: ${fmtSecs(ctx.parsed.y)}`}}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{color:gc()}},y:{ticks:{color:tc(),font:{size:10},callback:v=>fmtSecs(v)},grid:{color:gc()},title:{display:true,text:'seg (mejor vs peor km)',color:tc(),font:{size:10}}}}}});}
+  const pkm=document.getElementById('parcKmChart');
+  if(pkm&&entries.length){const bestKms=entries.map(e=>{const s=Array.isArray(e.kms)?e.kms.map(k=>toSecs(k)).filter(Boolean):[];return s.length?Math.min(...s)/60:null;});CH.parcKm=new Chart(pkm,{type:'line',data:{labels,datasets:[{label:'Mejor km',data:bestKms,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.08)',tension:.35,pointRadius:5,pointBackgroundColor:'#3b82f6',fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Mejor km: ${fmtSecs(Math.round(ctx.parsed.y*60))}`}}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{color:gc()}},y:{reverse:true,ticks:{color:tc(),font:{size:10},callback:v=>fmtSecs(Math.round(v*60))},grid:{color:gc()},title:{display:true,text:'min/km',color:tc(),font:{size:10}}}}}});}
+}
+
+async function saveRun(){
+  const f=document.getElementById('r-fecha').value;const d=parseFloat(document.getElementById('r-dist').value);const dur=document.getElementById('r-dur').value.trim();const rm=document.getElementById('r-ritmo').value.trim();
+  if(!f||!d||!dur||!rm){toast('Completa todos los campos');return;}
+  const run={fecha:f,dist:d,dur,ritmo:rm,vel:cv(d,dur)};
+  setBtnLoading('btn-save-run',true);
+  setStatus('Guardando en Google Sheets...','var(--amber)');
+  try{
+    await gsPost({action:'saveRun',run});
+    DB.runs.push(run);sortR();renderAll();
+    document.getElementById('r-dist').value='';document.getElementById('r-dur').value='';document.getElementById('r-ritmo').value='';
+    setStatus('Guardado - '+new Date().toLocaleTimeString(),'var(--green)');
+    toast('Sesion guardada en Google Sheets!');
+  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  setBtnLoading('btn-save-run',false);
+}
+async function saveWeight(){
+  const f=document.getElementById('w-fecha').value;const p=parseFloat(document.getElementById('w-peso').value);const a=parseFloat(document.getElementById('w-altura').value);
+  if(!f||!p||!a){toast('Fecha, peso y altura son obligatorios');return;}
+  const ci=parseFloat(document.getElementById('w-cintura').value)||null;const ca=parseFloat(document.getElementById('w-cadera').value)||null;const cu=parseFloat(document.getElementById('w-cuello').value)||null;
+  const weight={fecha:f,peso:p,altura:a,cintura:ci,cadera:ca,cuello:cu};
+  setBtnLoading('btn-save-weight',true);
+  setStatus('Guardando en Google Sheets...','var(--amber)');
+  try{
+    await gsPost({action:'saveWeight',weight});
+    DB.weights.push(weight);sortW();renderAll();
+    ['w-peso','w-cintura','w-cadera','w-cuello'].forEach(id=>document.getElementById(id).value='');
+    setStatus('Guardado - '+new Date().toLocaleTimeString(),'var(--green)');
+    toast('Medidas guardadas en Google Sheets!');
+  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  setBtnLoading('btn-save-weight',false);
+}
+async function delRun(fecha){
+  if(!confirm('Eliminar esta sesion?'))return;
+  try{
+    await gsPost({action:'deleteRun',fecha});
+    DB.runs=DB.runs.filter(r=>r.fecha!==fecha);renderAll();
+    toast('Sesion eliminada');
+  }catch(e){toast('Error al eliminar');}
+}
+async function delW(fecha){
+  if(!confirm('Eliminar este registro?'))return;
+  try{
+    await gsPost({action:'deleteWeight',fecha});
+    DB.weights=DB.weights.filter(w=>w.fecha!==fecha);renderAll();
+    toast('Registro eliminado');
+  }catch(e){toast('Error al eliminar');}
+}
+function setBtnLoading(id,loading){
+  const btn=document.getElementById(id);if(!btn)return;
+  btn.disabled=loading;btn.textContent=loading?'Guardando...':btn.getAttribute('data-label');
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  const t={overview:'Dashboard general',running:'Historial de running',spine:'Salud espinal',strength:'Plan de fuerza',nutrition:'Nutricion',ingresar:'Ingresar datos',parciales:'Parciales por km',actions:'Plan de accion'};
+  document.getElementById('page-title').textContent=t[id]||id;
+  // close sidebar on mobile after selecting
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function showTab(id,btn){['bA','bB','bC'].forEach(b=>document.getElementById(b).style.display='none');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).style.display='block';btn.classList.add('active');}
+function toggleTheme(){const d=document.documentElement;const dk_=d.getAttribute('data-theme')==='dark';d.setAttribute('data-theme',dk_?'light':'dark');document.getElementById('theme-label').textContent=dk_?'Modo oscuro':'Modo claro';setTimeout(renderAll,60);}
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('r-fecha').value=today;document.getElementById('w-fecha').value=today;
+document.getElementById('p-fecha').value=today;
+buildParciales();
+loadFromSheets();
+
+function analizarSesion(fecha, btn){
+  const entry = DB.parciales.find(e=>e.fecha===fecha);
+  if(!entry) return;
+  const row = document.getElementById('analysis-'+fecha);
+  const box = row.querySelector('.analysis-box');
+  if(row.style.display !== 'none'){row.style.display='none';return;}
+  row.style.display='';
+  box.className='analysis-box';
+
+  const kms = Array.isArray(entry.kms)?entry.kms:String(entry.kms).split(',');
+  const secsArr = kms.map(k=>toSecs(k)).filter(Boolean);
+  const best = secsArr.length?Math.min(...secsArr):null;
+  const worst = secsArr.length>1?Math.max(...secsArr):null;
+  const amp = best&&worst?worst-best:null;
+  const sd = secsArr.length>1?Math.round(stdDev(secsArr)):null;
+  const ns = negSplit(kms);
+  const ritmoSecs = toSecs(entry.ritmo);
+  const lastKmSec = secsArr.length?secsArr[secsArr.length-1]:null;
+  const firstKmSec = secsArr.length?secsArr[0]:null;
+
+  // Comparar con sesiones anteriores
+  const idx = DB.parciales.findIndex(e=>e.fecha===fecha);
+  const prev = idx>0?DB.parciales[idx-1]:null;
+  const prevRitmoSecs = prev?toSecs(prev.ritmo):null;
+  const mejoraPrev = prevRitmoSecs&&ritmoSecs?prevRitmoSecs-ritmoSecs:null;
+
+  const positivos = [];
+  const amejorar = [];
+  let consejo = '';
+
+  // ── Análisis de ritmo ──
+  const allRitmos = DB.parciales.map(e=>toSecs(e.ritmo)).filter(Boolean);
+  const mejorRitmoHistorico = allRitmos.length?Math.min(...allRitmos):null;
+  if(ritmoSecs&&mejorRitmoHistorico&&ritmoSecs===mejorRitmoHistorico)
+    positivos.push('Ritmo promedio más rápido de tu historial — marca personal.');
+  if(mejoraPrev&&mejoraPrev>0)
+    positivos.push(`Mejoraste ${mejoraPrev}s/km respecto a la sesión anterior — tendencia positiva.`);
+  else if(mejoraPrev&&mejoraPrev<-10)
+    amejorar.push(`Ritmo ${Math.abs(mejoraPrev)}s/km más lento que la sesión anterior — puede ser fatiga acumulada.`);
+
+  // ── Análisis de consistencia ──
+  if(amp!==null){
+    if(amp<=25) positivos.push(`Amplitud muy baja (${fmtSecs(amp)}) — corriste de forma muy pareja y consistente.`);
+    else if(amp<=45) positivos.push(`Amplitud moderada (${fmtSecs(amp)}) — buen control del ritmo general.`);
+    else amejorar.push(`Amplitud alta (${fmtSecs(amp)}) — hay mucha diferencia entre tu km más rápido y el más lento.`);
+  }
+  if(sd!==null){
+    if(sd<=10) positivos.push(`Desviación estándar muy baja (${sd}s) — ritmo muy uniforme a lo largo de la sesión.`);
+    else if(sd>25) amejorar.push(`Desviación estándar alta (${sd}s) — los parciales varían mucho, trabajá en mantener el esfuerzo constante.`);
+  }
+
+  // ── Análisis de split ──
+  if(ns!==null){
+    if(ns>10) positivos.push('Negative split claro — la segunda mitad fue más rápida, señal de buena distribución del esfuerzo.');
+    else if(ns>0) positivos.push('Leve negative split — terminaste a mejor ritmo del que arrancaste, muy bien.');
+    else if(ns<-15) amejorar.push('Positive split marcado — arrancaste demasiado rápido y bajaste el ritmo. Salí más conservador los primeros km.');
+  }
+
+  // ── Último km ──
+  if(lastKmSec&&best&&lastKmSec===best)
+    positivos.push('El último km fue el más rápido — excelente remate final, buena gestión de la energía.');
+  if(firstKmSec&&worst&&firstKmSec===worst)
+    positivos.push('Primer km el más lento — buen calentamiento progresivo, protege tus articulaciones.');
+  if(firstKmSec&&best&&firstKmSec===best)
+    amejorar.push('El primer km fue el más rápido — arrancás con demasiada energía. Salí 10-15s/km más lento al principio.');
+
+  // ── Distancia ──
+  const maxDist = Math.max(...DB.parciales.map(e=>parseNum(e.dist)));
+  if(parseNum(entry.dist)===maxDist&&maxDist>5)
+    positivos.push(`${entry.dist} km es tu mayor distancia registrada — progresión de volumen correcta.`);
+
+  // ── Consejo biomecánico personalizado ──
+  if(amp!==null&&amp>45)
+    consejo = 'Con tu pie derecho inestable, la irregularidad del ritmo aumenta el riesgo de sobrecarga en L4-L5. Enfocate en mantener cadencia constante (idealmente 170-180 pasos/min) para reducir el impacto asimétrico.';
+  else if(ns!==null&&ns<-15)
+    consejo = 'El positive split genera fatiga muscular que afecta tu patrón de pisada. Con tu tendencia a supinación, al fatigarte el pie derecho se vuelve más inestable. Salí 15s/km más lento los primeros 2 km.';
+  else if(ns!==null&&ns>10)
+    consejo = 'El negative split es ideal para tu perfil. Seguí con esta estrategia — protege tu columna lumbar al distribuir el esfuerzo progresivamente y reduce la sobrecarga en el talón lateral.';
+  else if(sd!==null&&sd<=10)
+    consejo = 'Ritmo muy uniforme — beneficioso para tu pisada. Mantené esta consistencia y en la próxima sesión intentá bajar el ritmo promedio 5-8s/km manteniendo la misma uniformidad.';
+  else
+    consejo = 'Para tu perfil biomecánico, la clave es la consistencia sobre la velocidad. Cada vez que el ritmo varía mucho, tu pie derecho compensa y sobrecarga la columna lumbar. Priorizá ritmo parejo antes que buscar marcas.';
+
+  // Fallbacks si no hay suficientes puntos
+  if(!positivos.length) positivos.push('Completaste la sesión — la consistencia en el entrenamiento es el factor más importante.');
+  if(!amejorar.length) amejorar.push('Seguí monitoreando la amplitud entre parciales para detectar fatiga temprana.');
+
+  const html = `
+    <div style="margin-bottom:10px;font-size:12px;font-weight:500;color:var(--text2);">Análisis — ${fd(fecha)} · ${entry.dist}km · ${entry.ritmo} min/km</div>
+    <div style="margin-bottom:8px;">
+      ${positivos.map(p=>`<div style="margin-bottom:4px;"><span class="analysis-pos">✅</span> ${p}</div>`).join('')}
+    </div>
+    <div style="margin-bottom:8px;">
+      ${amejorar.map(a=>`<div style="margin-bottom:4px;"><span class="analysis-neg">⚠️</span> ${a}</div>`).join('')}
+    </div>
+    <div style="background:var(--surface3,var(--surface2));border-radius:6px;padding:8px 10px;font-size:12px;border-left:3px solid var(--green);">
+      💡 ${consejo}
+    </div>`;
+  box.innerHTML=html;
+}
+</script>
+</body>
+</html>

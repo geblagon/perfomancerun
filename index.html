@@ -215,6 +215,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
     <button class="nav-item" onclick="showPage('ingresar',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>Ingresar datos</button>
     <div class="nav-section">Acciones</div>
     <button class="nav-item" onclick="showPage('parciales',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Parciales km</button>
+    <button class="nav-item" onclick="showPage('vitales',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Vitales y Clima</button>
     <button class="nav-item" onclick="showPage('actions',this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Plan de Accion</button>
   </nav>
   <div class="sidebar-footer">
@@ -376,6 +377,24 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
           <div class="form-group"><label>Duracion (ej: 0:36:18)</label><input type="text" id="r-dur" placeholder="0:36:18"></div>
           <div class="form-group"><label>Ritmo medio (ej: 7:15)</label><input type="text" id="r-ritmo" placeholder="7:15"></div>
         </div>
+        <div style="font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;margin-top:4px;">Vitales y condiciones — opcional</div>
+        <div class="form-grid-3">
+          <div class="form-group"><label>Cadencia (pasos/min)</label><input type="number" id="r-cadencia" placeholder="170" step="1" min="100" max="220"></div>
+          <div class="form-group"><label>FC promedio (lpm)</label><input type="number" id="r-fc" placeholder="145" step="1" min="40" max="220"></div>
+          <div class="form-group"><label>FC máxima (lpm)</label><input type="number" id="r-fc-max" placeholder="165" step="1" min="40" max="220"></div>
+          <div class="form-group"><label>Presión sistólica</label><input type="number" id="r-ta-sis" placeholder="120" step="1" min="60" max="220"></div>
+          <div class="form-group"><label>Presión diastólica</label><input type="number" id="r-ta-dia" placeholder="80" step="1" min="40" max="140"></div>
+          <div class="form-group"><label>Temperatura (°C)</label><input type="number" id="r-temp" placeholder="20" step="0.1"></div>
+          <div class="form-group"><label>Humedad (%)</label><input type="number" id="r-humedad" placeholder="60" step="1" min="0" max="100"></div>
+          <div class="form-group"><label>Presión atmosférica (hPa)</label><input type="number" id="r-presion" placeholder="1013" step="1" min="900" max="1100"></div>
+          <div class="form-group"><label>Nubosidad</label><select id="r-nubosidad" style="background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none;">
+            <option value="">— sin dato —</option>
+            <option value="despejado">Despejado ☀️</option>
+            <option value="parcial">Parcialmente nublado 🌤️</option>
+            <option value="nublado">Nublado ☁️</option>
+            <option value="cubierto">Cubierto 🌧️</option>
+          </select></div>
+        </div>
         <button class="btn-primary" id="btn-save-run" data-label="Guardar sesion" onclick="saveRun()">Guardar sesion</button>
       </div>
       <div class="card" style="margin-bottom:16px;">
@@ -466,6 +485,36 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
       </div>
     </div>
 
+    <!-- VITALES Y CLIMA -->
+    <div class="page" id="page-vitales">
+      <div class="section-header"><div><div class="section-title">Vitales y condiciones</div><div class="section-sub">Cadencia, frecuencia cardíaca, presión arterial y clima por sesión</div></div></div>
+
+      <!-- Métricas resumen -->
+      <div class="metrics-grid" id="vitales-metrics" style="margin-bottom:16px;"></div>
+
+      <!-- Gráficos -->
+      <div class="charts-grid" style="margin-bottom:16px;">
+        <div class="card"><div class="card-title">Cadencia (pasos/min)</div><div style="position:relative;height:200px;"><canvas id="cadenciaChart"></canvas></div></div>
+        <div class="card"><div class="card-title">Frecuencia cardíaca promedio (lpm)</div><div style="position:relative;height:200px;"><canvas id="fcChart"></canvas></div></div>
+      </div>
+      <div class="charts-grid" style="margin-bottom:16px;">
+        <div class="card"><div class="card-title">Temperatura al correr (°C)</div><div style="position:relative;height:200px;"><canvas id="tempChart"></canvas></div></div>
+        <div class="card"><div class="card-title">Humedad relativa (%)</div><div style="position:relative;height:200px;"><canvas id="humedadChart"></canvas></div></div>
+      </div>
+
+      <!-- Tabla historial vitales -->
+      <div class="card">
+        <div class="card-title">Historial de vitales por sesión</div>
+        <div class="data-wrap desktop-only">
+          <table class="ex-table">
+            <thead><tr><th>Fecha</th><th>Cadencia</th><th>FC prom</th><th>FC máx</th><th>TA</th><th>Temp</th><th>Humedad</th><th>Presión</th><th>Cielo</th></tr></thead>
+            <tbody id="vitalesTable"></tbody>
+          </table>
+        </div>
+        <div class="mobile-only mcrd-list" id="vitalesTableMobile"></div>
+      </div>
+    </div>
+
     <!-- ACTIONS -->
     <div class="page" id="page-actions">
       <div class="section-header"><div><div class="section-title">Plan de accion</div><div class="section-sub">Hoja de ruta preventiva - ordenada por urgencia</div></div></div>
@@ -511,7 +560,7 @@ async function loadFromSheets(){
   setStatus('Conectando con Google Sheets...','var(--amber)');
   try{
     const data=await gsGet();
-    DB.runs=(data.runs||[]).map(r=>({...r,dist:parseNum(r.dist),vel:parseNum(r.vel)}));
+    DB.runs=(data.runs||[]).map(r=>({...r,dist:parseNum(r.dist),vel:parseNum(r.vel),cadencia:r.cadencia?parseInt(r.cadencia):null,fc:r.fc?parseInt(r.fc):null,fcMax:r.fcMax?parseInt(r.fcMax):null,taSis:r.taSis?parseInt(r.taSis):null,taDia:r.taDia?parseInt(r.taDia):null,temp:r.temp!==undefined&&r.temp!==''?parseFloat(r.temp):null,humedad:r.humedad?parseInt(r.humedad):null,presionAtm:r.presionAtm?parseInt(r.presionAtm):null,nubosidad:r.nubosidad||null}));
     DB.weights=(data.weights||[]).map(w=>({...w,peso:parseNum(w.peso),altura:parseNum(w.altura),cintura:w.cintura?parseNum(w.cintura):null,cadera:w.cadera?parseNum(w.cadera):null,cuello:w.cuello?parseNum(w.cuello):null}));
     DB.parciales=(data.parciales||[]).map(p=>({...p,dist:parseNum(p.dist),vel:parseNum(p.vel)}));
     sortR();sortW();sortP();
@@ -659,7 +708,85 @@ function renderDataTables(){
       <div class="mcrd-actions"><button class="btn-del" onclick="delW('${w.fecha}')">Eliminar</button></div>
     </div>`).join(''):'<div class="empty-state">Sin registros aun</div>';
 }
-function renderAll(){renderOvMetrics();renderRunPage();renderDataTables();renderParcialesPage();initCharts();}
+function renderAll(){renderOvMetrics();renderRunPage();renderDataTables();renderParcialesPage();renderVitalesPage();initCharts();}
+
+function renderVitalesPage(){
+  const runs=DB.runs.filter(r=>r.cadencia||r.fc||r.temp||r.taSis);
+  // métricas resumen
+  const mv=document.getElementById('vitales-metrics');
+  if(mv){
+    const cads=runs.map(r=>r.cadencia).filter(Boolean);
+    const fcs=runs.map(r=>r.fc).filter(Boolean);
+    const tas=runs.filter(r=>r.taSis&&r.taDia);
+    const avgCad=cads.length?Math.round(cads.reduce((a,b)=>a+b,0)/cads.length):null;
+    const avgFc=fcs.length?Math.round(fcs.reduce((a,b)=>a+b,0)/fcs.length):null;
+    const lastCad=cads.length?cads[cads.length-1]:null;
+    const lastFc=fcs.length?fcs[fcs.length-1]:null;
+    const lastTa=tas.length?tas[tas.length-1]:null;
+    const cadStatus=lastCad?lastCad>=170&&lastCad<=180?'delta-pos':lastCad<160?'delta-neg':'delta-neu':'delta-neu';
+    mv.innerHTML=`
+      <div class="metric"><div class="metric-label">Cadencia última</div><div class="metric-value">${lastCad||'—'}<span style="font-size:14px;color:var(--text2)"> spm</span></div><div class="metric-delta ${cadStatus}">${avgCad?'prom: '+avgCad+' spm':'sin datos'}</div></div>
+      <div class="metric"><div class="metric-label">FC última sesión</div><div class="metric-value">${lastFc||'—'}<span style="font-size:14px;color:var(--text2)"> lpm</span></div><div class="metric-delta delta-neu">${avgFc?'prom: '+avgFc+' lpm':'sin datos'}</div></div>
+      <div class="metric"><div class="metric-label">Presión arterial</div><div class="metric-value" style="font-size:18px;">${lastTa?lastTa.taSis+'/'+lastTa.taDia:'—'}<span style="font-size:12px;color:var(--text2)"> mmHg</span></div><div class="metric-delta delta-neu">${lastTa?'última sesión':'sin datos'}</div></div>
+      <div class="metric"><div class="metric-label">Sesiones con vitales</div><div class="metric-value">${runs.length}</div><div class="metric-delta delta-neu">de ${DB.runs.length} totales</div></div>`;
+  }
+  // tabla desktop
+  const vt=document.getElementById('vitalesTable');
+  if(vt){
+    vt.innerHTML=DB.runs.length?DB.runs.map(r=>`<tr>
+      <td>${fd(r.fecha)}</td>
+      <td>${r.cadencia?r.cadencia+' spm':'—'}</td>
+      <td>${r.fc?r.fc+' lpm':'—'}</td>
+      <td>${r.fcMax?r.fcMax+' lpm':'—'}</td>
+      <td>${r.taSis&&r.taDia?r.taSis+'/'+r.taDia:'—'}</td>
+      <td>${r.temp!==null&&r.temp!==undefined?r.temp+'°C':'—'}</td>
+      <td>${r.humedad!==null&&r.humedad!==undefined?r.humedad+'%':'—'}</td>
+      <td>${r.presionAtm?r.presionAtm+' hPa':'—'}</td>
+      <td>${r.nubosidad||'—'}</td>
+    </tr>`).join(''):'<tr><td colspan="9" class="empty-state">Sin datos de vitales aun</td></tr>';
+  }
+  // tabla mobile
+  const vtm=document.getElementById('vitalesTableMobile');
+  if(vtm){
+    const conVitales=DB.runs.filter(r=>r.cadencia||r.fc||r.temp||r.taSis);
+    vtm.innerHTML=conVitales.length?conVitales.map(r=>`
+      <div class="mcrd-item">
+        <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(r.fecha)}</span></div>
+        ${r.cadencia?`<div class="mcrd-row"><span class="mcrd-label">Cadencia</span><span class="mcrd-val">${r.cadencia} spm</span></div>`:''}
+        ${r.fc?`<div class="mcrd-row"><span class="mcrd-label">FC prom</span><span class="mcrd-val">${r.fc} lpm</span></div>`:''}
+        ${r.fcMax?`<div class="mcrd-row"><span class="mcrd-label">FC máx</span><span class="mcrd-val">${r.fcMax} lpm</span></div>`:''}
+        ${r.taSis&&r.taDia?`<div class="mcrd-row"><span class="mcrd-label">Presión</span><span class="mcrd-val">${r.taSis}/${r.taDia} mmHg</span></div>`:''}
+        ${r.temp!==null&&r.temp!==undefined?`<div class="mcrd-row"><span class="mcrd-label">Temp</span><span class="mcrd-val">${r.temp}°C</span></div>`:''}
+        ${r.humedad!==null&&r.humedad!==undefined?`<div class="mcrd-row"><span class="mcrd-label">Humedad</span><span class="mcrd-val">${r.humedad}%</span></div>`:''}
+        ${r.nubosidad?`<div class="mcrd-row"><span class="mcrd-label">Cielo</span><span class="mcrd-val">${r.nubosidad}</span></div>`:''}
+      </div>`).join(''):'<div class="empty-state">Sin datos de vitales aun</div>';
+  }
+  // Gráficos
+  ['cadenciaChart','fcChart','tempChart','humedadChart'].forEach(id=>{if(CH[id]){try{CH[id].destroy();}catch(e){}}});
+  const runsConFecha=DB.runs;
+  const labels=runsConFecha.map(r=>fd(r.fecha));
+  const cadC=document.getElementById('cadenciaChart');
+  if(cadC){
+    const data=runsConFecha.map(r=>r.cadencia||null);
+    CH.cadenciaChart=new Chart(cadC,{type:'line',data:{labels,datasets:[{label:'Cadencia',data,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',tension:.3,pointRadius:5,pointBackgroundColor:'#1D9E75',spanGaps:true,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},annotation:{annotations:[{type:'line',yMin:170,yMax:170,borderColor:'rgba(29,158,117,0.4)',borderWidth:1,borderDash:[4,4]},{type:'line',yMin:180,yMax:180,borderColor:'rgba(29,158,117,0.4)',borderWidth:1,borderDash:[4,4]}]}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{color:gc()}},y:{min:150,max:200,ticks:{color:tc(),font:{size:10}},grid:{color:gc()},title:{display:true,text:'pasos/min',color:tc(),font:{size:10}}}}}});
+  }
+  const fcC=document.getElementById('fcChart');
+  if(fcC){
+    const fcData=runsConFecha.map(r=>r.fc||null);
+    const fcMaxData=runsConFecha.map(r=>r.fcMax||null);
+    CH.fcChart=new Chart(fcC,{type:'line',data:{labels,datasets:[{label:'FC promedio',data:fcData,borderColor:'#E24B4A',backgroundColor:'rgba(226,75,74,0.08)',tension:.3,pointRadius:4,spanGaps:true,fill:true},{label:'FC máxima',data:fcMaxData,borderColor:'#BA7517',backgroundColor:'transparent',tension:.3,pointRadius:4,spanGaps:true,borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{color:gc()}},y:{ticks:{color:tc(),font:{size:10}},grid:{color:gc()},title:{display:true,text:'lpm',color:tc(),font:{size:10}}}}}});
+  }
+  const tC=document.getElementById('tempChart');
+  if(tC){
+    const tData=runsConFecha.map(r=>r.temp!==null&&r.temp!==undefined?r.temp:null);
+    CH.tempChart=new Chart(tC,{type:'bar',data:{labels,datasets:[{label:'Temp',data:tData,backgroundColor:tData.map(t=>t===null?'transparent':t>=28?'rgba(226,75,74,0.6)':t>=22?'rgba(186,117,23,0.6)':'rgba(55,138,221,0.6)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{display:false}},y:{ticks:{color:tc(),font:{size:10},callback:v=>v+'°'},grid:{color:gc()}}}}});
+  }
+  const hC=document.getElementById('humedadChart');
+  if(hC){
+    const hData=runsConFecha.map(r=>r.humedad!==null&&r.humedad!==undefined?r.humedad:null);
+    CH.humedadChart=new Chart(hC,{type:'bar',data:{labels,datasets:[{label:'Humedad',data:hData,backgroundColor:'rgba(55,138,221,0.5)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{display:false}},y:{min:0,max:100,ticks:{color:tc(),font:{size:10},callback:v=>v+'%'},grid:{color:gc()}}}}});
+  }
+}
 
 // ── PARCIALES ──────────────────────────────────────────────────────────────
 function sortP(){DB.parciales.sort((a,b)=>parseDate(a.fecha)-parseDate(b.fecha));}
@@ -873,13 +1000,23 @@ function renderParcialesPage(){
 async function saveRun(){
   const f=document.getElementById('r-fecha').value;const d=parseFloat(document.getElementById('r-dist').value);const dur=document.getElementById('r-dur').value.trim();const rm=document.getElementById('r-ritmo').value.trim();
   if(!f||!d||!dur||!rm){toast('Completa todos los campos');return;}
-  const run={fecha:f,dist:d,dur,ritmo:rm,vel:cv(d,dur)};
+  const cadencia=document.getElementById('r-cadencia').value?parseInt(document.getElementById('r-cadencia').value):null;
+  const fc=document.getElementById('r-fc').value?parseInt(document.getElementById('r-fc').value):null;
+  const fcMax=document.getElementById('r-fc-max').value?parseInt(document.getElementById('r-fc-max').value):null;
+  const taSis=document.getElementById('r-ta-sis').value?parseInt(document.getElementById('r-ta-sis').value):null;
+  const taDia=document.getElementById('r-ta-dia').value?parseInt(document.getElementById('r-ta-dia').value):null;
+  const temp=document.getElementById('r-temp').value?parseFloat(document.getElementById('r-temp').value):null;
+  const humedad=document.getElementById('r-humedad').value?parseInt(document.getElementById('r-humedad').value):null;
+  const presionAtm=document.getElementById('r-presion').value?parseInt(document.getElementById('r-presion').value):null;
+  const nubosidad=document.getElementById('r-nubosidad').value||null;
+  const run={fecha:f,dist:d,dur,ritmo:rm,vel:cv(d,dur),cadencia,fc,fcMax,taSis,taDia,temp,humedad,presionAtm,nubosidad};
   setBtnLoading('btn-save-run',true);
   setStatus('Guardando en Google Sheets...','var(--amber)');
   try{
     await gsPost({action:'saveRun',run});
     DB.runs.push(run);sortR();renderAll();
-    document.getElementById('r-dist').value='';document.getElementById('r-dur').value='';document.getElementById('r-ritmo').value='';
+    ['r-dist','r-dur','r-ritmo','r-cadencia','r-fc','r-fc-max','r-ta-sis','r-ta-dia','r-temp','r-humedad','r-presion'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('r-nubosidad').value='';
     setStatus('Guardado - '+new Date().toLocaleTimeString(),'var(--green)');
     toast('Sesion guardada en Google Sheets!');
   }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
@@ -930,7 +1067,7 @@ function showPage(id,btn){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   btn.classList.add('active');
-  const t={overview:'Dashboard general',running:'Historial de running',spine:'Salud espinal',strength:'Plan de fuerza',nutrition:'Nutricion',ingresar:'Ingresar datos',parciales:'Parciales por km',actions:'Plan de accion'};
+  const t={overview:'Dashboard general',running:'Historial de running',spine:'Salud espinal',strength:'Plan de fuerza',nutrition:'Nutricion',ingresar:'Ingresar datos',parciales:'Parciales por km',vitales:'Vitales y Clima',actions:'Plan de accion'};
   document.getElementById('page-title').textContent=t[id]||id;
   // close sidebar on mobile after selecting
   document.getElementById('sidebar').classList.remove('open');

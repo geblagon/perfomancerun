@@ -584,10 +584,11 @@ async function loadFromSheets(){
       dist:parseNum(r.dist),vel:parseNum(r.vel),
       cadencia:r.cadencia?parseInt(r.cadencia):null,
       // cruzar con health
-      fc:r.fc?parseInt(r.fc):(healthByFecha[r.fecha]?.fc?parseInt(healthByFecha[r.fecha].fc):null),
-      fcMax:r.fcMax?parseInt(r.fcMax):(healthByFecha[r.fecha]?.fcMax?parseInt(healthByFecha[r.fecha].fcMax):null),
+      fc:r.fc?parseInt(r.fc):(healthByFecha[r.fecha]?.fcPostEsfuerzo?parseInt(healthByFecha[r.fecha].fcPostEsfuerzo):null),
+      fcMax:r.fcMax?parseInt(r.fcMax):(healthByFecha[r.fecha]?.fcReposo?parseInt(healthByFecha[r.fecha].fcReposo):null),
       taSis:r.taSis?parseInt(r.taSis):(healthByFecha[r.fecha]?.taSis?parseInt(healthByFecha[r.fecha].taSis):null),
       taDia:r.taDia?parseInt(r.taDia):(healthByFecha[r.fecha]?.taDia?parseInt(healthByFecha[r.fecha].taDia):null),
+      cadencia:r.cadencia?parseInt(r.cadencia):(healthByFecha[r.fecha]?.cadencia?parseInt(healthByFecha[r.fecha].cadencia):null),
       // cruzar con weather
       temp:r.temp!==''&&r.temp!==undefined?parseFloat(r.temp):(weatherByFecha[r.fecha]?.temp!==''&&weatherByFecha[r.fecha]?.temp!==undefined?parseFloat(weatherByFecha[r.fecha].temp):null),
       humedad:r.humedad?parseInt(r.humedad):(weatherByFecha[r.fecha]?.humedad?parseInt(weatherByFecha[r.fecha].humedad):null),

@@ -431,7 +431,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
         <div class="card-title">Sesiones registradas</div>
         <div class="data-wrap desktop-only"><table class="ex-table"><thead><tr><th>Fecha</th><th>Distancia</th><th>Duracion</th><th>Ritmo</th><th>Velocidad</th><th></th></tr></thead><tbody id="runTableData"></tbody></table></div><div class="mobile-only mcrd-list" id="runTableDataMobile"></div>
         <div style="margin-top:20px;"><div class="card-title">Registros de peso</div>
-        <div class="data-wrap desktop-only"><table class="ex-table"><thead><tr><th>Fecha</th><th>Peso (kg)</th><th>IMC</th><th>Cintura</th><th>Cadera</th><th></th></tr></thead><tbody id="weightTableData"></tbody></table></div><div class="mobile-only mcrd-list" id="weightTableDataMobile"></div></div>
+        <div class="data-wrap desktop-only"><table class="ex-table"><thead><tr><th>Fecha</th><th>Peso (kg)</th><th>IMC</th><th>ICA</th><th>ICC</th><th>% Grasa</th><th></th></tr></thead><tbody id="weightTableData"></tbody></table></div><div class="mobile-only mcrd-list" id="weightTableDataMobile"></div></div>
         <div style="margin-top:20px;padding-top:16px;border-top:.5px solid var(--border);">
           <div style="background:var(--surface2);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="color:var(--green);flex-shrink:0;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
@@ -642,6 +642,23 @@ function fd(iso){
 function rtn(r){if(!r)return 0;const rs=String(r).trim();if(!rs.includes(':'))return 0;const p=rs.split(':');return parseFloat(p[0])+parseFloat(p[1])/60;}
 function cv(dist,dur){if(!dist||!dur)return 0;const p=dur.split(':');let s=0;if(p.length===3)s=parseInt(p[0])*3600+parseInt(p[1])*60+parseInt(p[2]);else if(p.length===2)s=parseInt(p[0])*60+parseInt(p[1]);if(!s)return 0;return Math.round((dist/(s/3600))*100)/100;}
 function imc(p,a){return Math.round((p/(a*a))*100)/100;}
+function calcICA(cintura,altura){if(!cintura||!altura)return null;return Math.round((parseFloat(cintura)/parseFloat(altura))*1000)/1000;}
+function calcICC(cintura,cadera){if(!cintura||!cadera)return null;return Math.round((parseFloat(cintura)/parseFloat(cadera))*1000)/1000;}
+function calcGrasaNaval(peso,altura,cintura,cuello,cadera){
+  // Fórmula de la Marina de EEUU (hombres)
+  if(!peso||!altura||!cintura||!cuello||!cadera)return null;
+  const c=parseFloat(cintura)*100,cu=parseFloat(cuello)*100,h=parseFloat(altura)*100;
+  const pct=495/(1.0324-0.19077*Math.log10(c-cu)+0.15456*Math.log10(h))-450;
+  return Math.round(pct*10)/10;
+}
+function calcMasaMagra(peso,pctGrasa){if(!peso||!pctGrasa)return null;return Math.round(parseFloat(peso)*(1-parseFloat(pctGrasa)/100)*10)/10;}
+function calcMasaGrasa(peso,pctGrasa){if(!peso||!pctGrasa)return null;return Math.round(parseFloat(peso)*(parseFloat(pctGrasa)/100)*10)/10;}
+// Objetivos por índice
+function icaStatus(v){if(!v)return{cls:'delta-neu',txt:'sin datos'};if(v<0.5)return{cls:'delta-pos',txt:'✓ Óptimo (<0.50)'};if(v<0.6)return{cls:'delta-neu',txt:'⚠ Riesgo moderado (0.50–0.60)'};return{cls:'delta-neg',txt:'✗ Riesgo alto (>0.60)'};}
+function iccStatus(v){if(!v)return{cls:'delta-neu',txt:'sin datos'};if(v<0.9)return{cls:'delta-pos',txt:'✓ Saludable (<0.90)'};if(v<0.95)return{cls:'delta-neu',txt:'⚠ Riesgo moderado (0.90–0.95)'};return{cls:'delta-neg',txt:'✗ Riesgo alto (>0.95)'};}
+function grasaStatus(v){if(!v)return{cls:'delta-neu',txt:'sin datos'};if(v<20)return{cls:'delta-pos',txt:'✓ Atlético (<20%)'};if(v<25)return{cls:'delta-pos',txt:'✓ Saludable (20–25%)'};if(v<30)return{cls:'delta-neu',txt:'⚠ Sobrepeso (25–30%)'};return{cls:'delta-neg',txt:'✗ Obesidad (>30%)'};}
+function imcStatus(v){if(!v)return{cls:'delta-neu',txt:'sin datos'};if(v<25)return{cls:'delta-pos',txt:'✓ Normal (<25)'};if(v<30)return{cls:'delta-neu',txt:'⚠ Sobrepeso (25–30)'};return{cls:'delta-neg',txt:'✗ Obesidad (>30)'};}
+
 function dk(){return document.documentElement.getAttribute('data-theme')==='dark';}
 function gc(){return dk()?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.07)';}
 function tc(){return dk()?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.40)';}
@@ -671,13 +688,25 @@ function renderOvMetrics(){
   const mD=runs.reduce((b,r)=>r.dist>b.dist?r:b,runs[0]);
   const mV=runs.reduce((b,r)=>r.vel>b.vel?r:b,runs[0]);
   const pd=(lW.peso-fW.peso).toFixed(1);
-  const in_=imc(parseFloat(lW.peso),parseFloat(lW.altura));const if_=imc(parseFloat(fW.peso),parseFloat(fW.altura));
+  const in_=imc(parseFloat(lW.peso),parseFloat(lW.altura));
+  const if_=imc(parseFloat(fW.peso),parseFloat(fW.altura));
+  // Índices corporales
+  const ica=calcICA(lW.cintura,lW.altura);
+  const icc=calcICC(lW.cintura,lW.cadera);
+  const grasa=calcGrasaNaval(lW.peso,lW.altura,lW.cintura,lW.cuello,lW.cadera);
+  const magra=calcMasaMagra(lW.peso,grasa);
+  const masaG=calcMasaGrasa(lW.peso,grasa);
+  const icaSt=icaStatus(ica);const iccSt=iccStatus(icc);const grSt=grasaStatus(grasa);const imcSt=imcStatus(in_);
   document.getElementById('overview-metrics').innerHTML=`
-    <div class="metric"><div class="metric-label">Peso actual</div><div class="metric-value">${parseFloat(lW.peso)||0} <span style="font-size:14px;color:var(--text2)">kg</span></div><div class="metric-delta ${pd<0?'delta-pos':'delta-neg'}">${pd<0?'&#8595;':'&#8593;'} ${Math.abs(pd)} kg desde inicio</div></div>
-    <div class="metric"><div class="metric-label">IMC</div><div class="metric-value">${in_}</div><div class="metric-delta ${in_<if_?'delta-pos':'delta-neg'}">${in_<if_?'&#8595;':'&#8593;'} ${Math.abs((in_-if_).toFixed(2))} pts</div></div>
-    <div class="metric"><div class="metric-label">Mejor ritmo</div><div class="metric-value">${bR.ritmo} <span style="font-size:14px;color:var(--text2)">min/km</span></div><div class="metric-delta delta-pos">desde ${runs[0].ritmo}</div></div>
+    <div class="metric"><div class="metric-label">Peso actual</div><div class="metric-value">${parseFloat(lW.peso)||0} <span style="font-size:14px;color:var(--text2)">kg</span></div><div class="metric-delta ${pd<0?'delta-pos':'delta-neg'}">${pd<0?'↓':'↑'} ${Math.abs(pd)} kg desde inicio</div></div>
+    <div class="metric"><div class="metric-label">IMC</div><div class="metric-value">${in_}</div><div class="metric-delta ${imcSt.cls}">${imcSt.txt}</div></div>
+    <div class="metric"><div class="metric-label">ICA <span style="font-size:10px;opacity:.6">(cintura/altura)</span></div><div class="metric-value">${ica||'—'}</div><div class="metric-delta ${icaSt.cls}">${icaSt.txt}</div></div>
+    <div class="metric"><div class="metric-label">ICC <span style="font-size:10px;opacity:.6">(cintura/cadera)</span></div><div class="metric-value">${icc||'—'}</div><div class="metric-delta ${iccSt.cls}">${iccSt.txt}</div></div>
+    <div class="metric"><div class="metric-label">% Grasa corporal <span style="font-size:10px;opacity:.6">fórmula naval</span></div><div class="metric-value">${grasa||'—'}<span style="font-size:14px;color:var(--text2)">%</span></div><div class="metric-delta ${grSt.cls}">${grSt.txt}</div></div>
+    <div class="metric"><div class="metric-label">Masa magra</div><div class="metric-value">${magra||'—'}<span style="font-size:14px;color:var(--text2)"> kg</span></div><div class="metric-delta delta-neu">objetivo: mantener o aumentar</div></div>
+    <div class="metric"><div class="metric-label">Masa grasa</div><div class="metric-value">${masaG||'—'}<span style="font-size:14px;color:var(--text2)"> kg</span></div><div class="metric-delta delta-neu">objetivo: bajar a ~20 kg</div></div>
+    <div class="metric"><div class="metric-label">Mejor ritmo</div><div class="metric-value">${bR.ritmo} <span style="font-size:14px;color:var(--text2)">min/km</span></div><div class="metric-delta delta-pos">objetivo: 5:30 min/km</div></div>
     <div class="metric"><div class="metric-label">Distancia max</div><div class="metric-value">${parseFloat(mD.dist)||0} <span style="font-size:14px;color:var(--text2)">km</span></div><div class="metric-delta delta-pos">desde ${runs[0].dist} km</div></div>
-    <div class="metric"><div class="metric-label">Velocidad max</div><div class="metric-value">${(parseFloat(mV.vel)||0).toFixed(2)} <span style="font-size:14px;color:var(--text2)">km/h</span></div><div class="metric-delta delta-pos">+${((mV.vel-runs[0].vel)/runs[0].vel*100).toFixed(1)}%</div></div>
     <div class="metric"><div class="metric-label">Sesiones</div><div class="metric-value">${runs.length}</div><div class="metric-delta delta-neu">registradas</div></div>`;
 }
 function renderRunPage(){
@@ -728,21 +757,29 @@ function renderDataTables(){
       <div class="mcrd-actions"><button class="btn-del" onclick="delRun('${r.fecha}')">Eliminar</button></div>
     </div>`).join(''):'<div class="empty-state">Sin sesiones aun</div>';
   const wtEl=document.getElementById('weightTableData');
-  wtEl.innerHTML=wts.length?wts.map(w=>`<tr>
-    <td>${fd(w.fecha)}</td><td>${w.peso} kg</td><td>${imc(w.peso,w.altura)}</td>
-    <td>${w.cintura||'-'}</td><td>${w.cadera||'-'}</td>
-    <td><button class="btn-del" onclick="delW('${w.fecha}')">X</button></td>
-  </tr>`).join(''):'<tr><td colspan="6" class="empty-state">Sin registros aun</td></tr>';
+  wtEl.innerHTML=wts.length?wts.map(w=>{
+    const g=calcGrasaNaval(w.peso,w.altura,w.cintura,w.cuello,w.cadera);
+    const ica=calcICA(w.cintura,w.altura);
+    const icc=calcICC(w.cintura,w.cadera);
+    return`<tr>
+      <td>${fd(w.fecha)}</td><td>${w.peso} kg</td><td>${imc(w.peso,w.altura)}</td>
+      <td>${ica||'-'}</td><td>${icc||'-'}</td><td>${g?g+'%':'-'}</td>
+      <td><button class="btn-del" onclick="delW('${w.fecha}')">X</button></td>
+    </tr>`;}).join(''):'<tr><td colspan="7" class="empty-state">Sin registros aun</td></tr>';
   const wtmEl=document.getElementById('weightTableDataMobile');
-  if(wtmEl) wtmEl.innerHTML=wts.length?wts.map(w=>`
-    <div class="mcrd-item">
+  if(wtmEl) wtmEl.innerHTML=wts.length?wts.map(w=>{
+    const g=calcGrasaNaval(w.peso,w.altura,w.cintura,w.cuello,w.cadera);
+    const ica=calcICA(w.cintura,w.altura);
+    const icc=calcICC(w.cintura,w.cadera);
+    return`<div class="mcrd-item">
       <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(w.fecha)}</span></div>
       <div class="mcrd-row"><span class="mcrd-label">Peso</span><span class="mcrd-val">${w.peso} kg</span></div>
       <div class="mcrd-row"><span class="mcrd-label">IMC</span><span class="mcrd-val">${imc(w.peso,w.altura)}</span></div>
-      <div class="mcrd-row"><span class="mcrd-label">Cintura</span><span class="mcrd-val">${w.cintura||'-'}</span></div>
-      <div class="mcrd-row"><span class="mcrd-label">Cadera</span><span class="mcrd-val">${w.cadera||'-'}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">ICA</span><span class="mcrd-val">${ica||'-'}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">ICC</span><span class="mcrd-val">${icc||'-'}</span></div>
+      <div class="mcrd-row"><span class="mcrd-label">% Grasa</span><span class="mcrd-val">${g?g+'%':'-'}</span></div>
       <div class="mcrd-actions"><button class="btn-del" onclick="delW('${w.fecha}')">Eliminar</button></div>
-    </div>`).join(''):'<div class="empty-state">Sin registros aun</div>';
+    </div>`;}).join(''):'<div class="empty-state">Sin registros aun</div>';
 }
 function renderAll(){renderOvMetrics();renderRunPage();renderDataTables();renderParcialesPage();renderVitalesPage();initCharts();}
 

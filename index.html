@@ -855,11 +855,12 @@ function renderVitalesPage(){
 
   // Gráficos
   ['cadenciaChart','fcChart','tempChart','humedadChart'].forEach(id=>{if(CH[id]){try{CH[id].destroy();}catch(e){}}});
-  const labels=runs.map(r=>fd(r.fecha));
 
-  // Solo usar runs que tienen al menos algún dato de vitales/clima para los labels
-  const runsVit=runs.filter(r=>r.cadencia||r.fc||r.fcMax||r.taSis||r.temp!==null&&r.temp!==undefined&&r.temp!=='');
+  // Deduplicar por fecha y filtrar solo con vitales/clima
+  const runsPorFecha=Object.values(runs.reduce((acc,r)=>{acc[r.fecha]=r;return acc;},{}));
+  const runsVit=runsPorFecha.filter(r=>r.cadencia||r.fc||r.fcMax||r.taSis||r.temp!==null&&r.temp!==undefined&&r.temp!=='');
   const labelsVit=runsVit.map(r=>fd(r.fecha));
+  console.log('runsVit:',runsVit.map(r=>({fecha:r.fecha,cadencia:r.cadencia,fc:r.fc,fcMax:r.fcMax})));
 
   const cadC=document.getElementById('cadenciaChart');
   if(cadC){CH.cadenciaChart=new Chart(cadC,{type:'line',data:{labels:labelsVit,datasets:[{label:'Cadencia',data:runsVit.map(r=>r.cadencia||null),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',tension:.3,pointRadius:7,pointHoverRadius:9,pointBackgroundColor:'#1D9E75',spanGaps:false,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc(),font:{size:10},maxRotation:40},grid:{color:gc()}},y:{min:150,max:200,ticks:{color:tc(),font:{size:10}},grid:{color:gc()},title:{display:true,text:'spm',color:tc(),font:{size:10}}}}}});}

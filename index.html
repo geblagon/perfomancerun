@@ -239,7 +239,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
     <!-- OVERVIEW -->
     <div class="page active" id="page-overview">
       <div class="metrics-grid" id="overview-metrics"></div>
-      <div class="alert"><div class="alert-title">Alertas biomecanicas activas</div><ul class="alert-list"><li>Deficit L4-L5 - sin trabajo de core documentado en historial</li><li>Pie derecho inestable - asimetria de carga 55/45 izquierda/derecha</li><li>Escalada de volumen sin base de fuerza previa (2 km a 6 km)</li><li>Evaluacion de pisada desactualizada - estudios de 2016-17</li></ul></div>
+      <div class="alert"><div class="alert-title">Alertas biomecanicas activas — actualizado 03/06/2026</div><ul class="alert-list"><li>Deficit L4-L5 - sin trabajo de core documentado en historial</li><li>Pie derecho: colapso arco plantar en dinamica — tiempo de apoyo +16% vs pie izquierdo</li><li>Propulsion reducida bilateral — fase de propulsion insuficiente en ambos pies</li><li>Tendencia supinatoria lateral bilateral — 44% carga lateral global</li><li>Cadencia actual 162-163 spm — por debajo del optimo 170-180 spm</li><li>Plantillas personalizadas pendientes — prioridad segun estudio 2026</li><li>Kinesiologia pendiente — psoas y estabilidad lumbopelvica sin iniciar</li></ul></div>
       <div class="charts-grid">
         <div class="card"><div class="card-title">Progresion de running - distancia y ritmo</div><div class="legs"><div class="leg"><div class="leg-sq" style="background:#1D9E75;"></div>Distancia (km)</div><div class="leg"><div class="leg-sq" style="background:#BA7517;opacity:.7;"></div>Ritmo (min/km)</div></div><div style="position:relative;height:220px;"><canvas id="runChart"></canvas></div></div>
         <div class="card"><div class="card-title">Peso corporal - evolucion</div><div style="position:relative;height:260px;"><canvas id="weightChartOv"></canvas></div></div>
@@ -253,13 +253,13 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
           <div class="prog-row"><div class="prog-name">Score postura</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:79%;"></div></div><div class="prog-val badge badge-green">78.5/100</div></div>
           <div class="prog-row"><div class="prog-name">Score marcha</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:75%;"></div></div><div class="prog-val badge badge-green">75/100</div></div>
         </div>
-        <div class="card"><div class="card-title">Biomecanica de pisada</div>
-          <div class="prog-row"><div class="prog-name">Pie derecho</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val badge badge-red">Inestable</div></div>
-          <div class="prog-row"><div class="prog-name">Carga lado izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:58%;"></div></div><div class="prog-val badge badge-amber">55-60%</div></div>
-          <div class="prog-row"><div class="prog-name">Propulsion</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val badge badge-amber">Reducida</div></div>
+        <div class="card"><div class="card-title">Biomecanica de pisada — estudio 03/06/2026</div>
+          <div class="prog-row"><div class="prog-name">Distribucion bilateral</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val badge badge-green">50/50 ✅</div></div>
+          <div class="prog-row"><div class="prog-name">Pie derecho (dinamica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val badge badge-red">Colapso arco</div></div>
+          <div class="prog-row"><div class="prog-name">Tiempo apoyo der. vs izq.</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:60%;"></div></div><div class="prog-val badge badge-amber">+16% der.</div></div>
+          <div class="prog-row"><div class="prog-name">Propulsion bilateral</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val badge badge-amber">Reducida</div></div>
+          <div class="prog-row"><div class="prog-name">Tendencia lateral global</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val badge badge-amber">44% lateral</div></div>
           <div class="prog-row"><div class="prog-name">Pie izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val badge badge-green">Normal</div></div>
-          <div class="prog-row"><div class="prog-name">Eficiencia marcha</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:52%;"></div></div><div class="prog-val badge badge-amber">Media</div></div>
-          <div class="prog-row"><div class="prog-name">Centro de gravedad</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val badge badge-amber">Compensado</div></div>
         </div>
       </div>
     </div>
@@ -274,22 +274,24 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
 
     <!-- SPINE -->
     <div class="page" id="page-spine">
-      <div class="section-header"><div><div class="section-title">Salud espinal - analisis clinico</div><div class="section-sub">Basado en espinograma y baropodometria 2016-17</div></div><span class="badge badge-amber">Requiere actualizacion</span></div>
-      <div class="alert"><div class="alert-title">Movimientos prohibidos o a modificar</div><ul class="alert-list"><li>Running de impacto elevado sin calentamiento de core (10 min minimo previo)</li><li>Sentadilla profunda con carga hasta tener evaluacion actualizada</li><li>Ejercicios de hiperextension lumbar (buenos dias, Roman deadlift)</li><li>Impacto repetido en piso duro sin plantillas adecuadas</li><li>Aumentar volumen de km antes de 4 semanas de fuerza base</li></ul></div>
+      <div class="section-header"><div><div class="section-title">Salud espinal - analisis clinico</div><div class="section-sub">Baropodometría actualizada 03/06/2026 — Estudio BAROSCAN por Aimone Pablo</div></div><span class="badge badge-green">Actualizado 2026</span></div>
+      <div class="alert"><div class="alert-title">Movimientos prohibidos o a modificar</div><ul class="alert-list"><li>Running de impacto elevado sin calentamiento de core (10 min minimo previo)</li><li>Sentadilla profunda con carga hasta tener evaluacion actualizada</li><li>Ejercicios de hiperextension lumbar (buenos dias, Roman deadlift)</li><li>Impacto repetido en piso duro sin plantillas adecuadas</li><li>Aumentar volumen de km antes de iniciar kinesiologia</li></ul></div>
       <div class="charts-2">
-        <div class="card"><div class="card-title">Columna vertebral</div>
+        <div class="card"><div class="card-title">Columna vertebral — referencial 2016-17</div>
           <div class="prog-row"><div class="prog-name">Desalineacion lumbar</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:40%;"></div></div><div class="prog-val">Leve</div></div>
           <div class="prog-row"><div class="prog-name">Desnivel pelvico</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:15%;"></div></div><div class="prog-val">0.2 cm</div></div>
           <div class="prog-row"><div class="prog-name">Artrosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:30%;"></div></div><div class="prog-val">Incipiente</div></div>
           <div class="prog-row"><div class="prog-name">Espacio L4-L5</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:55%;"></div></div><div class="prog-val">Disminuido</div></div>
           <div class="prog-row"><div class="prog-name">Lordosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">Rectificada</div></div>
         </div>
-        <div class="card"><div class="card-title">Pisada y distribucion de carga</div>
+        <div class="card"><div class="card-title">Pisada y distribucion de carga — BAROSCAN 2026</div>
+          <div class="prog-row"><div class="prog-name">Distribucion bilateral</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val">50/50 ✅ mejora</div></div>
           <div class="prog-row"><div class="prog-name">Pie derecho (estatica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val">Cavo</div></div>
-          <div class="prog-row"><div class="prog-name">Pie derecho (dinamica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">Plano</div></div>
-          <div class="prog-row"><div class="prog-name">Pie izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val">Normal</div></div>
-          <div class="prog-row"><div class="prog-name">Carga pierna izq.</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:58%;"></div></div><div class="prog-val">55-60%</div></div>
-          <div class="prog-row"><div class="prog-name">Carga pierna der.</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:43%;"></div></div><div class="prog-val">40-45%</div></div>
+          <div class="prog-row"><div class="prog-name">Pie derecho (dinamica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:35%;"></div></div><div class="prog-val">Colapso arco</div></div>
+          <div class="prog-row"><div class="prog-name">Tiempo apoyo derecho</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:60%;"></div></div><div class="prog-val">1.76s (+16%)</div></div>
+          <div class="prog-row"><div class="prog-name">Tiempo apoyo izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:75%;"></div></div><div class="prog-val">1.52s</div></div>
+          <div class="prog-row"><div class="prog-name">Propulsion bilateral</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val">Reducida</div></div>
+          <div class="prog-row"><div class="prog-name">Tendencia lateral global</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">44% lateral</div></div>
         </div>
       </div>
       <div class="card"><div class="card-title">Cadena biomecanica compensatoria</div>

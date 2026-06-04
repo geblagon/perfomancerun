@@ -562,10 +562,18 @@ function setStatus(msg,color){
   document.getElementById('topbar-meta').textContent=msg;
 }
 
-async function gsGet(){
-  const res=await fetch(API+'?action=read',{redirect:'follow'});
-  const text=await res.text();
-  return JSON.parse(text);
+async function gsGet(retries=3){
+  for(let i=0;i<retries;i++){
+    try{
+      const res=await fetch(API+'?action=read',{redirect:'follow'});
+      const text=await res.text();
+      return JSON.parse(text);
+    }catch(e){
+      if(i===retries-1)throw e;
+      setStatus('Reintentando conexion ('+(i+1)+'/'+retries+')...','var(--amber)');
+      await new Promise(r=>setTimeout(r,3000));
+    }
+  }
 }
 async function gsPost(body){
   const res=await fetch(API,{method:'POST',body:JSON.stringify(body),redirect:'follow'});
@@ -713,7 +721,8 @@ function renderOvMetrics(){
     <div class="metric"><div class="metric-label">Sesiones</div><div class="metric-value">${runs.length}</div><div class="metric-delta delta-neu">registradas</div></div>`;
 }
 function renderRunPage(){
-  sortR();const runs=DB.runs;
+  sortR();
+  const runs=Object.values(DB.runs.reduce((acc,r)=>{acc[r.fecha]=r;return acc;},{})).sort((a,b)=>a.fecha.localeCompare(b.fecha));
   document.getElementById('run-sub').textContent=`${runs.length} sesiones registradas`;
   if(!runs.length){document.getElementById('run-metrics').innerHTML='';document.getElementById('runTable').innerHTML='<tr><td colspan="6" class="empty-state">Sin sesiones aun</td></tr>';return;}
   const bR=runs.reduce((b,r)=>rtn(r.ritmo)<rtn(b.ritmo)?r:b,runs[0]);
@@ -729,7 +738,6 @@ function renderRunPage(){
     <td>${r.ritmo} min/km</td><td>${r.vel.toFixed(2)} km/h</td>
     <td><button class="btn-del" onclick="delRun('${r.fecha}')">X</button></td>
   </tr>`).join('');
-  // Mobile card list
   const rmcEl=document.getElementById('runTableMobile');
   if(rmcEl) rmcEl.innerHTML=runs.map(r=>`
     <div class="mcrd-item">
@@ -742,7 +750,9 @@ function renderRunPage(){
     </div>`).join('');
 }
 function renderDataTables(){
-  sortR();sortW();const runs=DB.runs;const wts=DB.weights;
+  sortR();sortW();
+  const runs=Object.values(DB.runs.reduce((acc,r)=>{acc[r.fecha]=r;return acc;},{})).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const wts=DB.weights;
   const rtEl=document.getElementById('runTableData');
   rtEl.innerHTML=runs.length?runs.map(r=>`<tr>
     <td>${fd(r.fecha)}</td><td>${r.dist} km</td><td>${r.dur}</td>
@@ -1218,7 +1228,7 @@ document.getElementById('w-clima-fecha').value=today;
 document.getElementById('w-fecha').value=today;
 document.getElementById('p-fecha').value=today;
 buildParciales();
-loadFromSheets();
+setTimeout(loadFromSheets, 1000);
 
 function analizarSesion(fecha, btn){
   const entry = DB.parciales.find(e=>e.fecha===fecha);

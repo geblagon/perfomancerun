@@ -560,11 +560,13 @@ function setStatus(msg,color){
 }
 
 async function gsGet(){
-  const res=await fetch(API+'?action=read');
+  const res=await fetch(API+'?action=read',{redirect:'follow',mode:'cors'});
+  if(!res.ok)throw new Error('HTTP '+res.status);
   return await res.json();
 }
 async function gsPost(body){
-  const res=await fetch(API,{method:'POST',body:JSON.stringify(body)});
+  const res=await fetch(API,{method:'POST',body:JSON.stringify(body),redirect:'follow',mode:'cors'});
+  if(!res.ok)throw new Error('HTTP '+res.status);
   return await res.json();
 }
 function parseNum(v){return parseFloat(String(v).replace(',','.').trim())||0;}

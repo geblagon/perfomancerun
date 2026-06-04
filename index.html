@@ -1199,9 +1199,12 @@ function showPage(id,btn){
   btn.classList.add('active');
   const t={overview:'Dashboard general',running:'Historial de running',spine:'Salud espinal',strength:'Plan de fuerza',nutrition:'Nutricion',ingresar:'Ingresar datos',parciales:'Parciales por km',vitales:'Vitales y Clima',actions:'Plan de accion'};
   document.getElementById('page-title').textContent=t[id]||id;
-  // close sidebar on mobile after selecting
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('open');
+  // Re-renderizar gráficos cuando la página es visible
+  if(id==='vitales') setTimeout(renderVitalesPage, 50);
+  if(id==='parciales') setTimeout(renderParcialesPage, 50);
+  if(id==='overview') setTimeout(initCharts, 50);
 }
 function showTab(id,btn){['bA','bB','bC'].forEach(b=>document.getElementById(b).style.display='none');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).style.display='block';btn.classList.add('active');}
 function toggleTheme(){const d=document.documentElement;const dk_=d.getAttribute('data-theme')==='dark';d.setAttribute('data-theme',dk_?'light':'dark');document.getElementById('theme-label').textContent=dk_?'Modo oscuro':'Modo claro';setTimeout(renderAll,60);}

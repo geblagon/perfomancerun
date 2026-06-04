@@ -238,7 +238,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
     <!-- OVERVIEW -->
     <div class="page active" id="page-overview">
       <div class="metrics-grid" id="overview-metrics"></div>
-      <div class="alert"><div class="alert-title">Alertas biomecanicas activas — actualizado 03/06/2026</div><ul class="alert-list"><li>Deficit L4-L5 - sin trabajo de core documentado en historial</li><li>Pie derecho: colapso de arco en dinamica confirmado (cavo estatico / plano dinamico — persiste desde 2016)</li><li>Propulsion reducida bilateralmente — pie derecho 16% mas lento que izquierdo (1.76s vs 1.52s de apoyo)</li><li>Plantillas personalizadas pendientes — prioridad maxima segun baropodometria 2026</li><li>Kinesiologia cubierta por F800 sin limite — iniciar trabajo de psoas y propiocepcion arco derecho</li></ul></div>
+      <div class="alert"><div class="alert-title">Alertas biomecanicas activas</div><ul class="alert-list"><li>Deficit L4-L5 - sin trabajo de core documentado en historial</li><li>Pie derecho inestable - asimetria de carga 55/45 izquierda/derecha</li><li>Escalada de volumen sin base de fuerza previa (2 km a 6 km)</li><li>Evaluacion de pisada desactualizada - estudios de 2016-17</li></ul></div>
       <div class="charts-grid">
         <div class="card"><div class="card-title">Progresion de running - distancia y ritmo</div><div class="legs"><div class="leg"><div class="leg-sq" style="background:#1D9E75;"></div>Distancia (km)</div><div class="leg"><div class="leg-sq" style="background:#BA7517;opacity:.7;"></div>Ritmo (min/km)</div></div><div style="position:relative;height:220px;"><canvas id="runChart"></canvas></div></div>
         <div class="card"><div class="card-title">Peso corporal - evolucion</div><div style="position:relative;height:260px;"><canvas id="weightChartOv"></canvas></div></div>
@@ -254,7 +254,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
         </div>
         <div class="card"><div class="card-title">Biomecanica de pisada</div>
           <div class="prog-row"><div class="prog-name">Pie derecho</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val badge badge-red">Inestable</div></div>
-          <div class="prog-row"><div class="prog-name">Carga lado izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:50%;"></div></div><div class="prog-val badge badge-green">50.4% ✓</div></div>
+          <div class="prog-row"><div class="prog-name">Carga lado izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:58%;"></div></div><div class="prog-val badge badge-amber">55-60%</div></div>
           <div class="prog-row"><div class="prog-name">Propulsion</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val badge badge-amber">Reducida</div></div>
           <div class="prog-row"><div class="prog-name">Pie izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val badge badge-green">Normal</div></div>
           <div class="prog-row"><div class="prog-name">Eficiencia marcha</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:52%;"></div></div><div class="prog-val badge badge-amber">Media</div></div>
@@ -273,7 +273,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
 
     <!-- SPINE -->
     <div class="page" id="page-spine">
-      <div class="section-header"><div><div class="section-title">Salud espinal - analisis clinico</div><div class="section-sub">Baropodometria actualizada 03/06/2026 (BAROSCAN) + espinograma 2016-17 referencial</div></div><span class="badge badge-green">Actualizado 2026</span></div>
+      <div class="section-header"><div><div class="section-title">Salud espinal - analisis clinico</div><div class="section-sub">Basado en espinograma y baropodometria 2016-17</div></div><span class="badge badge-amber">Requiere actualizacion</span></div>
       <div class="alert"><div class="alert-title">Movimientos prohibidos o a modificar</div><ul class="alert-list"><li>Running de impacto elevado sin calentamiento de core (10 min minimo previo)</li><li>Sentadilla profunda con carga hasta tener evaluacion actualizada</li><li>Ejercicios de hiperextension lumbar (buenos dias, Roman deadlift)</li><li>Impacto repetido en piso duro sin plantillas adecuadas</li><li>Aumentar volumen de km antes de 4 semanas de fuerza base</li></ul></div>
       <div class="charts-2">
         <div class="card"><div class="card-title">Columna vertebral</div>
@@ -287,8 +287,8 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
           <div class="prog-row"><div class="prog-name">Pie derecho (estatica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val">Cavo</div></div>
           <div class="prog-row"><div class="prog-name">Pie derecho (dinamica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">Plano</div></div>
           <div class="prog-row"><div class="prog-name">Pie izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val">Normal</div></div>
-          <div class="prog-row"><div class="prog-name">Carga pierna izq.</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:50%;"></div></div><div class="prog-val">50.4% ✓</div></div>
-          <div class="prog-row"><div class="prog-name">Carga pierna der.</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:50%;"></div></div><div class="prog-val">49.6% ✓</div></div>
+          <div class="prog-row"><div class="prog-name">Carga pierna izq.</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:58%;"></div></div><div class="prog-val">55-60%</div></div>
+          <div class="prog-row"><div class="prog-name">Carga pierna der.</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:43%;"></div></div><div class="prog-val">40-45%</div></div>
         </div>
       </div>
       <div class="card"><div class="card-title">Cadena biomecanica compensatoria</div>
@@ -536,13 +536,12 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
         <div class="action-row"><div><div class="action-name">Revisar calzado - desgaste lateral</div><div class="action-sub">Controlar suela por supinacion parcial documentada</div></div><span class="badge badge-red">Esta semana</span></div>
       </div>
       <div class="card" style="margin-bottom:16px;"><div class="card-title">Proximas 2-4 semanas</div>
-        <div class="action-row"><div><div class="action-name">✅ Baropodometria 2026 completada</div><div class="action-sub">BAROSCAN 03/06/2026 — Prof. Aimone Pablo — distribucion bilateral normalizada (50/50)</div></div><span class="badge badge-green">Completado</span></div>
-        <div class="action-row"><div><div class="action-name">Turno de kinesiologa — prioridad alta</div><div class="action-sub">Cubierto por F800 sin limite de sesiones — psoas, core lumbopelvico, propiocepcion arco derecho</div></div><span class="badge badge-amber">Pendiente</span></div>
+        <div class="action-row"><div><div class="action-name">Turno con traumatologo</div><div class="action-sub">Evaluacion de pisada actualizada - estudios de 2016-17 ya no son validos</div></div><span class="badge badge-amber">15 dias</span></div>
         <div class="action-row"><div><div class="action-name">Incorporar Bloque B y C al plan</div><div class="action-sub">Gluteos, cadera y propiocepcion de pie derecho</div></div><span class="badge badge-amber">Semana 2</span></div>
         <div class="action-row"><div><div class="action-name">Implementar plan nutricional</div><div class="action-sub">Target ~2.490 kcal, priorizar antiinflamatorios y omega-3</div></div><span class="badge badge-amber">Esta semana</span></div>
       </div>
       <div class="card"><div class="card-title">30-60 dias</div>
-        <div class="action-row"><div><div class="action-name">Plantillas personalizadas — datos disponibles</div><div class="action-sub">Baropodometria 2026 lista — priorizar control colapso arco derecho dinamico, correccion lateral bilateral</div></div><span class="badge badge-red">Proxima accion</span></div>
+        <div class="action-row"><div><div class="action-name">Plantillas personalizadas</div><div class="action-sub">Con datos de nueva evaluacion de pisada</div></div><span class="badge badge-blue">30 dias</span></div>
         <div class="action-row"><div><div class="action-name">Control traumatologico de seguimiento</div><div class="action-sub">Evaluar progreso y autorizar incremento de km</div></div><span class="badge badge-blue">60 dias</span></div>
         <div class="action-row"><div><div class="action-name">Progresion a 8 km</div><div class="action-sub">Solo si base de fuerza consolidada y pisada corregida</div></div><span class="badge badge-green">60-90 dias</span></div>
       </div>
@@ -787,7 +786,10 @@ function renderAll(){renderOvMetrics();renderRunPage();renderDataTables();render
 function renderVitalesPage(){
   const runs=DB.runs;
   const runsConVitales=runs.filter(r=>r.cadencia||r.fc||r.taSis);
+  // Deduplicar por fecha — mostrar solo el último registro por fecha
+  const vitalesPorFecha=Object.values(runsConVitales.reduce((acc,r)=>{acc[r.fecha]=r;return acc;},{}));
   const runsConClima=runs.filter(r=>r.temp!==null&&r.temp!==undefined&&r.temp!==''||r.humedad||r.nubosidad);
+  const climaPorFecha=Object.values(runsConClima.reduce((acc,r)=>{acc[r.fecha]=r;return acc;},{}));
 
   // Métricas resumen
   const mv=document.getElementById('vitales-metrics');
@@ -813,16 +815,16 @@ function renderVitalesPage(){
 
   // Tablas health
   const ht=document.getElementById('healthTable');
-  if(ht) ht.innerHTML=runs.length?runs.filter(r=>r.cadencia||r.fc||r.taSis).map(r=>`<tr>
+  if(ht) ht.innerHTML=vitalesPorFecha.length?vitalesPorFecha.map(r=>`<tr>
     <td>${fd(r.fecha)}</td>
     <td>${r.cadencia?r.cadencia+' spm':'—'}</td>
     <td>${r.fc?r.fc+' lpm':'—'}</td>
     <td>${r.fcMax?r.fcMax+' lpm':'—'}</td>
     <td>${r.taSis&&r.taDia?r.taSis+'/'+r.taDia+' mmHg':'—'}</td>
-  </tr>`).join('')||'<tr><td colspan="5" class="empty-state">Sin datos de vitales aún</td></tr>':'<tr><td colspan="5" class="empty-state">Sin datos aún</td></tr>';
+  </tr>`).join(''):'<tr><td colspan="5" class="empty-state">Sin datos de vitales aún</td></tr>';
 
   const htm=document.getElementById('healthTableMobile');
-  if(htm) htm.innerHTML=runsConVitales.length?runsConVitales.map(r=>`
+  if(htm) htm.innerHTML=vitalesPorFecha.length?vitalesPorFecha.map(r=>`
     <div class="mcrd-item">
       <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(r.fecha)}</span></div>
       ${r.cadencia?`<div class="mcrd-row"><span class="mcrd-label">Cadencia</span><span class="mcrd-val">${r.cadencia} spm</span></div>`:''}
@@ -833,7 +835,7 @@ function renderVitalesPage(){
 
   // Tablas weather
   const wt=document.getElementById('weatherTable');
-  if(wt) wt.innerHTML=runsConClima.length?runsConClima.map(r=>`<tr>
+  if(wt) wt.innerHTML=climaPorFecha.length?climaPorFecha.map(r=>`<tr>
     <td>${fd(r.fecha)}</td>
     <td>${r.temp!==null&&r.temp!==undefined&&r.temp!==''?r.temp+'°C':'—'}</td>
     <td>${r.humedad?r.humedad+'%':'—'}</td>
@@ -842,7 +844,7 @@ function renderVitalesPage(){
   </tr>`).join(''):'<tr><td colspan="5" class="empty-state">Sin datos de clima aún</td></tr>';
 
   const wtm=document.getElementById('weatherTableMobile');
-  if(wtm) wtm.innerHTML=runsConClima.length?runsConClima.map(r=>`
+  if(wtm) wtm.innerHTML=climaPorFecha.length?climaPorFecha.map(r=>`
     <div class="mcrd-item">
       <div class="mcrd-row"><span class="mcrd-label">Fecha</span><span class="mcrd-val">${fd(r.fecha)}</span></div>
       ${r.temp!==null&&r.temp!==undefined&&r.temp!==''?`<div class="mcrd-row"><span class="mcrd-label">Temp</span><span class="mcrd-val">${r.temp}°C</span></div>`:''}

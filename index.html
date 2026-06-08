@@ -239,7 +239,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
     <!-- OVERVIEW -->
     <div class="page active" id="page-overview">
       <div class="metrics-grid" id="overview-metrics"></div>
-      <div class="alert"><div class="alert-title">Alertas biomecanicas activas — actualizado 03/06/2026</div><ul class="alert-list"><li>Deficit L4-L5 - sin trabajo de core documentado en historial</li><li>Pie derecho: colapso arco plantar en dinamica — tiempo de apoyo +16% vs pie izquierdo</li><li>Propulsion reducida bilateral — fase de propulsion insuficiente en ambos pies</li><li>Tendencia supinatoria lateral bilateral — 44% carga lateral global</li><li>Cadencia actual 162-163 spm — por debajo del optimo 170-180 spm</li><li>Plantillas personalizadas pendientes — prioridad segun estudio 2026</li><li>Kinesiologia pendiente — psoas y estabilidad lumbopelvica sin iniciar</li></ul></div>
+      <div class="alert"><div class="alert-title">Alertas clinicas activas — actualizado 08/06/2026</div><ul class="alert-list"><li>L4-L5: abombamiento discoosteofitario con insinuacion foraminal bilateral — sin compresion activa (RMN 04/06/2026)</li><li>Contractura psoas iliaco activa — dolor mecanico en reposo, desaparece al correr</li><li>Lordosis insuficiente (40°) para incidencia pelviana alta (57°) — brecha de 17° sobrecarga L4-L5</li><li>Pie derecho: colapso arco plantar en dinamica — tiempo de apoyo +16% vs pie izquierdo</li><li>Plantillas personalizadas pendientes + kinesiologia F800 sin iniciar</li></ul></div>
       <div class="charts-grid">
         <div class="card"><div class="card-title">Progresion de running - distancia y ritmo</div><div class="legs"><div class="leg"><div class="leg-sq" style="background:#1D9E75;"></div>Distancia (km)</div><div class="leg"><div class="leg-sq" style="background:#BA7517;opacity:.7;"></div>Ritmo (min/km)</div></div><div style="position:relative;height:220px;"><canvas id="runChart"></canvas></div></div>
         <div class="card"><div class="card-title">Peso corporal - evolucion</div><div style="position:relative;height:260px;"><canvas id="weightChartOv"></canvas></div></div>
@@ -274,38 +274,72 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
 
     <!-- SPINE -->
     <div class="page" id="page-spine">
-      <div class="section-header"><div><div class="section-title">Salud espinal - analisis clinico</div><div class="section-sub">Baropodometría actualizada 03/06/2026 — Estudio BAROSCAN por Aimone Pablo</div></div><span class="badge badge-green">Actualizado 2026</span></div>
-      <div class="alert"><div class="alert-title">Movimientos prohibidos o a modificar</div><ul class="alert-list"><li>Running de impacto elevado sin calentamiento de core (10 min minimo previo)</li><li>Sentadilla profunda con carga hasta tener evaluacion actualizada</li><li>Ejercicios de hiperextension lumbar (buenos dias, Roman deadlift)</li><li>Impacto repetido en piso duro sin plantillas adecuadas</li><li>Aumentar volumen de km antes de iniciar kinesiologia</li></ul></div>
+      <div class="section-header"><div><div class="section-title">Salud espinal - analisis clinico</div><div class="section-sub">RMN 04/06/2026 · Espinograma 05/06/2026 · Baropodometría 03/06/2026 — Diagnóstico Maipú</div></div><span class="badge badge-green">Actualizado junio 2026</span></div>
+
+      <div class="alert"><div class="alert-title">Movimientos contraindicados — activos al 08/06/2026</div><ul class="alert-list"><li>Estirar psoas agresivamente por cuenta propia (extension lumbar forzada puede irritar foramen L4-L5)</li><li>Pliometria y saltos unipodales — hasta RMN procesada por kinesiologo</li><li>Ejercicios de hiperextension lumbar (buenos dias, Roman deadlift)</li><li>Impacto repetido en piso duro sin plantillas adecuadas</li><li>Aumentar volumen de km antes de iniciar kinesiologia + plantillas</li></ul></div>
+
       <div class="charts-2">
-        <div class="card"><div class="card-title">Columna vertebral — referencial 2016-17</div>
-          <div class="prog-row"><div class="prog-name">Desalineacion lumbar</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:40%;"></div></div><div class="prog-val">Leve</div></div>
-          <div class="prog-row"><div class="prog-name">Desnivel pelvico</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:15%;"></div></div><div class="prog-val">0.2 cm</div></div>
-          <div class="prog-row"><div class="prog-name">Artrosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:30%;"></div></div><div class="prog-val">Incipiente</div></div>
-          <div class="prog-row"><div class="prog-name">Espacio L4-L5</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:55%;"></div></div><div class="prog-val">Disminuido</div></div>
-          <div class="prog-row"><div class="prog-name">Lordosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">Rectificada</div></div>
+        <div class="card"><div class="card-title">RMN lumbosacra — 04/06/2026 (3 Tesla, Dra. Steffen)</div>
+          <div class="prog-row"><div class="prog-name">Compresion radicular</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:100%;"></div></div><div class="prog-val badge badge-green">Ausente ✅</div></div>
+          <div class="prog-row"><div class="prog-name">Hernia discal</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:100%;"></div></div><div class="prog-val badge badge-green">No hay ✅</div></div>
+          <div class="prog-row"><div class="prog-name">Cono medular</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:100%;"></div></div><div class="prog-val badge badge-green">Normal ✅</div></div>
+          <div class="prog-row"><div class="prog-name">L2-L3</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:30%;"></div></div><div class="prog-val">Abomb. incipiente</div></div>
+          <div class="prog-row"><div class="prog-name">L3-L4</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:40%;"></div></div><div class="prog-val">Abomb. ligero</div></div>
+          <div class="prog-row"><div class="prog-name">L4-L5 ⚠️ nivel critico</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:70%;"></div></div><div class="prog-val badge badge-red">Insinuacion foraminal</div></div>
+          <div class="prog-row"><div class="prog-name">Deshidratacion discal</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:60%;"></div></div><div class="prog-val">Generalizada</div></div>
         </div>
-        <div class="card"><div class="card-title">Pisada y distribucion de carga — BAROSCAN 2026</div>
+        <div class="card"><div class="card-title">Espinograma — 05/06/2026 (Dr. Buccolo)</div>
+          <div class="prog-row"><div class="prog-name">Cifosis dorsal T1-T12</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:60%;"></div></div><div class="prog-val">49° (leve ↑)</div></div>
+          <div class="prog-row"><div class="prog-name">Lordosis lumbar L1-L5</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">40° (insuficiente)</div></div>
+          <div class="prog-row"><div class="prog-name">Incidencia pelviana</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:65%;"></div></div><div class="prog-val">57° (alta)</div></div>
+          <div class="prog-row"><div class="prog-name">Brecha lordosis/incidencia</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:55%;"></div></div><div class="prog-val badge badge-red">17° deficit</div></div>
+          <div class="prog-row"><div class="prog-name">Balance sagital</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">+52mm anterior</div></div>
+          <div class="prog-row"><div class="prog-name">Balance coronal</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val">-35mm</div></div>
+          <div class="prog-row"><div class="prog-name">Escoliosis dorsal</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:40%;"></div></div><div class="prog-val">Sinistro convexa</div></div>
+          <div class="prog-row"><div class="prog-name">Lordosis cervical</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val">Rectificada</div></div>
+        </div>
+      </div>
+
+      <div class="charts-2" style="margin-top:0;">
+        <div class="card"><div class="card-title">Pisada y distribucion de carga — BAROSCAN 03/06/2026</div>
           <div class="prog-row"><div class="prog-name">Distribucion bilateral</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:80%;"></div></div><div class="prog-val">50/50 ✅ mejora</div></div>
-          <div class="prog-row"><div class="prog-name">Pie derecho (estatica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:40%;"></div></div><div class="prog-val">Cavo</div></div>
+          <div class="prog-row"><div class="prog-name">Pie derecho (estatica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">Cavo</div></div>
           <div class="prog-row"><div class="prog-name">Pie derecho (dinamica)</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:35%;"></div></div><div class="prog-val">Colapso arco</div></div>
           <div class="prog-row"><div class="prog-name">Tiempo apoyo derecho</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:60%;"></div></div><div class="prog-val">1.76s (+16%)</div></div>
           <div class="prog-row"><div class="prog-name">Tiempo apoyo izquierdo</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:75%;"></div></div><div class="prog-val">1.52s</div></div>
           <div class="prog-row"><div class="prog-name">Propulsion bilateral</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:45%;"></div></div><div class="prog-val">Reducida</div></div>
-          <div class="prog-row"><div class="prog-name">Tendencia lateral global</div><div class="prog-bar-wrap"><div class="prog-bar bar-warn" style="width:50%;"></div></div><div class="prog-val">44% lateral</div></div>
+        </div>
+        <div class="card"><div class="card-title">Sintoma activo — junio 2026</div>
+          <div class="prog-row"><div class="prog-name">Contractura psoas iliaco</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:70%;"></div></div><div class="prog-val badge badge-red">Activo</div></div>
+          <div class="prog-row"><div class="prog-name">Dolor al levantarse/acostarse</div><div class="prog-bar-wrap"><div class="prog-bar bar-danger" style="width:65%;"></div></div><div class="prog-val">Presente</div></div>
+          <div class="prog-row"><div class="prog-name">Dolor al correr</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:90%;"></div></div><div class="prog-val badge badge-green">Ausente ✅</div></div>
+          <div class="prog-row"><div class="prog-name">Irradiacion neurologica</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:100%;"></div></div><div class="prog-val badge badge-green">No hay ✅</div></div>
+          <div class="prog-row"><div class="prog-name">Hormigueo miembros inf.</div><div class="prog-bar-wrap"><div class="prog-bar bar-ok" style="width:100%;"></div></div><div class="prog-val badge badge-green">No hay ✅</div></div>
+          <div style="margin-top:12px;padding:10px;background:var(--blue-bg);border-radius:8px;font-size:12px;color:var(--blue-text);"><strong>Posicion de alivio:</strong> decubito dorsal con rodillas flexionadas y pies apoyados. Calor local en zona iliaca.</div>
         </div>
       </div>
-      <div class="card"><div class="card-title">Cadena biomecanica compensatoria</div>
+
+      <div class="card"><div class="card-title">Cadena biomecanica compensatoria — confirmada por 3 estudios junio 2026</div>
         <div style="padding:16px 0;display:flex;align-items:center;gap:0;flex-wrap:wrap;">
-          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--red-bg);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Pie derecho inestable</div></div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--red-bg);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Pie derecho colapsa en dinamica</div></div>
           <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
-          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Sobrecarga pierna izq.</div></div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Compensacion pelvica cronica</div></div>
           <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
-          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Desequilibrio pelvico</div></div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Incidencia pelviana 57° / lordosis insuficiente 40°</div></div>
           <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
-          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--red-bg);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Impacto L4-L5</div></div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--red-bg);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Sobrecarga L4-L5</div></div>
           <div style="color:var(--text3);font-size:18px;padding:0 4px;">→</div>
-          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--amber-bg);color:var(--amber-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Contractura cervical refleja</div></div>
+          <div style="text-align:center;min-width:110px;padding:8px;"><div style="background:var(--red-bg);color:var(--red-text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;">Insinuacion foraminal bilateral L4-L5</div></div>
         </div>
+        <div style="margin-top:8px;padding:10px;background:var(--green-bg);border-radius:8px;font-size:12px;color:var(--green-text);"><strong>Sin compresion activa.</strong> Patron mecanico cronico — reversible con plantillas + kinesiologia. Correr 7km habilitado con monitoreo.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px;"><div class="card-title">Señales de stop — consultar antes de seguir corriendo</div>
+        <ul class="alert-list" style="list-style:none;padding:8px 0;">
+          <li style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:.5px solid var(--border);font-size:13px;color:var(--text);"><span style="color:var(--red);font-weight:700;">→</span>Dolor que irradie a gluteo, muslo posterior o pantorrilla</li>
+          <li style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:.5px solid var(--border);font-size:13px;color:var(--text);"><span style="color:var(--red);font-weight:700;">→</span>Hormigueo o adormecimiento en piernas o pies</li>
+          <li style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px;color:var(--text);"><span style="color:var(--red);font-weight:700;">→</span>Dolor lumbar durante carrera que no ceda en 24-48hs</li>
+        </ul>
       </div>
     </div>
 
@@ -539,7 +573,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
         <div class="action-row"><div><div class="action-name">Revisar calzado - desgaste lateral</div><div class="action-sub">Controlar suela por supinacion parcial documentada</div></div><span class="badge badge-red">Esta semana</span></div>
       </div>
       <div class="card" style="margin-bottom:16px;"><div class="card-title">Proximas 2-4 semanas</div>
-        <div class="action-row"><div><div class="action-name">Turno con traumatologo</div><div class="action-sub">Evaluacion de pisada actualizada - estudios de 2016-17 ya no son validos</div></div><span class="badge badge-amber">15 dias</span></div>
+        <div class="action-row"><div><div class="action-name">Turno con traumatologo</div><div class="action-sub">Dr. Zanola Alarcon / CIMEBA — llevar los 3 estudios: baro, espinograma y RMN junio 2026</div></div><span class="badge badge-red">Urgente</span></div>
         <div class="action-row"><div><div class="action-name">Incorporar Bloque B y C al plan</div><div class="action-sub">Gluteos, cadera y propiocepcion de pie derecho</div></div><span class="badge badge-amber">Semana 2</span></div>
         <div class="action-row"><div><div class="action-name">Implementar plan nutricional</div><div class="action-sub">Target ~2.490 kcal, priorizar antiinflamatorios y omega-3</div></div><span class="badge badge-amber">Esta semana</span></div>
       </div>

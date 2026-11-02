@@ -598,37 +598,95 @@ function setStatus(msg,color){
   document.getElementById('topbar-meta').textContent=msg;
 }
 
-async function gsGet(retries=3){
+// Llamada al Apps Script con reintentos y chequeo de la respuesta.
+// Si el script devuelve {error:...} se trata como fallo (antes se ignoraba y el dato
+// aparecia en pantalla aunque no se hubiera guardado en el Sheet).
+async function gsCall(doFetch,retries=3){
+  let lastErr;
   for(let i=0;i<retries;i++){
     try{
-      const res=await fetch(API+'?action=read',{redirect:'follow'});
+      const res=await doFetch();
       const text=await res.text();
-      return JSON.parse(text);
+      let data;
+      try{data=JSON.parse(text);}catch(_){throw new Error('Respuesta no valida de Google Apps Script');}
+      if(data&&data.error)throw new Error(data.error);
+      return data;
     }catch(e){
-      if(i===retries-1)throw e;
-      setStatus('Reintentando conexion ('+(i+1)+'/'+retries+')...','var(--amber)');
-      await new Promise(r=>setTimeout(r,3000));
+      lastErr=e;
+      console.warn('Google Sheets intento '+(i+1)+'/'+retries+':',e);
+      if(i<retries-1){
+        setStatus('Reintentando conexion ('+(i+1)+'/'+retries+')...','var(--amber)');
+        await new Promise(r=>setTimeout(r,2500));
+      }
     }
   }
+  throw lastErr;
+}
+async function gsGet(){
+  return gsCall(()=>fetch(API+'?action=read&t='+Date.now(),{redirect:'follow',cache:'no-store'}));
 }
 async function gsPost(body){
-  const res=await fetch(API,{method:'POST',body:JSON.stringify(body),redirect:'follow'});
-  const text=await res.text();
-  return JSON.parse(text);
+  // text/plain evita el preflight CORS que Apps Script no soporta
+  return gsCall(()=>fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'}));
+}
+// Duracion: Sheets interpreta "48:51" como 48 horas. Siempre mandamos H:MM:SS.
+function normDur(s){
+  s=String(s||'').trim();if(!s)return s;
+  const p=s.split(':').map(x=>parseInt(x,10));
+  if(p.some(isNaN))return s;
+  let h=0,m=0,sec=0;
+  if(p.length===2){m=p[0];sec=p[1];}
+  else if(p.length===3){
+    // valor ya guardado mal: "48:51:00" = 48 min 51 s
+    if(p[0]>=4&&p[2]===0){m=p[0];sec=p[1];}else{h=p[0];m=p[1];sec=p[2];}
+  }else return s;
+  h+=Math.floor(m/60);m=m%60;
+  return h+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}
+// Quita filas repetidas (misma fecha, distancia y duracion), conservando datos no vacios
+function dedupe(arr,keyFn){
+  const map=new Map();
+  arr.forEach(o=>{
+    const k=keyFn(o);
+    if(!map.has(k)){map.set(k,{...o});return;}
+    const prev=map.get(k);
+    Object.keys(o).forEach(f=>{if((prev[f]===''||prev[f]==null)&&o[f]!==''&&o[f]!=null)prev[f]=o[f];});
+  });
+  return [...map.values()];
+}
+// Une varias filas de la misma fecha tomando el ultimo valor no vacio de cada campo
+function byFechaMerged(arr){
+  const out={};
+  arr.forEach(o=>{
+    const k=normFecha(o.fecha);
+    out[k]=out[k]||{};
+    Object.keys(o).forEach(f=>{if(o[f]!==''&&o[f]!=null)out[k][f]=o[f];});
+  });
+  return out;
+}
+function normFecha(s){
+  s=String(s||'').trim();
+  const m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  return m?m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'):s;
 }
 function parseNum(v){return parseFloat(String(v).replace(',','.').trim())||0;}
 async function loadFromSheets(){
   setStatus('Conectando con Google Sheets...','var(--amber)');
+  let data;
+  try{data=await gsGet();}
+  catch(e){
+    console.error('loadFromSheets conexion:',e);
+    setStatus('Sin conexion con Google Sheets ('+(e.message||'error')+')','var(--red)');
+    return;
+  }
   try{
-    const data=await gsGet();
 
     // health y weather indexados por fecha para cruce
-    const healthByFecha={};
-    (data.health||[]).forEach(h=>{healthByFecha[h.fecha]=h;});
-    const weatherByFecha={};
-    (data.weather||[]).forEach(w=>{weatherByFecha[w.fecha]=w;});
+    const healthByFecha=byFechaMerged(data.health||[]);
+    const weatherByFecha=byFechaMerged(data.weather||[]);
 
-    DB.runs=(data.runs||[]).map(r=>({
+    const runsRaw=dedupe((data.runs||[]).map(r=>({...r,fecha:normFecha(r.fecha),dur:normDur(r.dur)})),r=>r.fecha+'|'+parseNum(r.dist)+'|'+r.dur);
+    DB.runs=runsRaw.map(r=>({
       ...r,
       dist:parseNum(r.dist),vel:parseNum(r.vel),
       cadencia:r.cadencia?parseInt(r.cadencia):(healthByFecha[r.fecha]?.cadencia?parseInt(healthByFecha[r.fecha].cadencia):null),
@@ -641,8 +699,8 @@ async function loadFromSheets(){
       presionAtm:r.presionAtm?parseInt(r.presionAtm):(weatherByFecha[r.fecha]?.presionAtm?parseInt(weatherByFecha[r.fecha].presionAtm):null),
       nubosidad:r.nubosidad||weatherByFecha[r.fecha]?.nubosidad||null
     }));
-    DB.weights=(data.weights||[]).map(w=>({...w,peso:parseNum(w.peso),altura:parseNum(w.altura),cintura:w.cintura?parseNum(w.cintura):null,cadera:w.cadera?parseNum(w.cadera):null,cuello:w.cuello?parseNum(w.cuello):null}));
-    DB.parciales=(data.parciales||[]).map(p=>({...p,dist:parseNum(p.dist),vel:parseNum(p.vel)}));
+    DB.weights=dedupe((data.weights||[]).map(w=>({...w,fecha:normFecha(w.fecha)})),w=>w.fecha+'|'+w.peso).map(w=>({...w,peso:parseNum(w.peso),altura:parseNum(w.altura),cintura:w.cintura?parseNum(w.cintura):null,cadera:w.cadera?parseNum(w.cadera):null,cuello:w.cuello?parseNum(w.cuello):null}));
+    DB.parciales=dedupe((data.parciales||[]).map(p=>({...p,fecha:normFecha(p.fecha),dur:normDur(p.dur),kms:(Array.isArray(p.kms)?p.kms:String(p.kms||'').split(',').filter(Boolean)).map(k=>String(k).trim().replace('.',':'))})),p=>p.fecha+'|'+p.dur).map(p=>({...p,dist:parseNum(p.dist),vel:parseNum(p.vel)}));
     DB.health=(data.health||[]);
     DB.weather=(data.weather||[]);
     sortR();sortW();sortP();
@@ -650,8 +708,9 @@ async function loadFromSheets(){
     renderAll();
     setTimeout(renderParcialesPage, 300);
   }catch(e){
-    console.error('loadFromSheets error:',e);
-    setStatus('Error de conexion - verificá tu internet','var(--red)');
+    // Los datos llegaron bien; el fallo es al procesarlos o dibujarlos
+    console.error('loadFromSheets render:',e);
+    setStatus('Datos recibidos, error al mostrarlos: '+(e.message||e),'var(--red)');
   }
 }
 
@@ -950,7 +1009,7 @@ function clearParcForm(){
 async function saveParciales(){
   const f=document.getElementById('p-fecha').value;
   const dist=parseInt(document.getElementById('p-dist').value);
-  const dur=document.getElementById('p-dur').value.trim();
+  const dur=normDur(document.getElementById('p-dur').value.trim());
   const ritmo=document.getElementById('p-ritmo').value.trim();
   if(!f||!dist||!dur||!ritmo){toast('Completa fecha, duración y ritmo');return;}
   const kms=[];
@@ -959,19 +1018,16 @@ async function saveParciales(){
   setBtnLoading('btn-save-parc',true);
   setStatus('Guardando parciales en Google Sheets...','var(--amber)');
   try{
+    // El Apps Script ya crea la fila en "runs" si no existe esa fecha.
+    // (Antes el dashboard ademas llamaba a saveRun y quedaba duplicada.)
     await gsPost({action:'saveParciales',entry});
     DB.parciales.push(entry);sortP();
-    // also add to runs if not already there
-    if(!DB.runs.find(r=>r.fecha===f)){
-      const run={fecha:f,dist,dur,ritmo,vel:cv(dist,dur)};
-      await gsPost({action:'saveRun',run});
-      DB.runs.push(run);sortR();
-    }
+    if(!DB.runs.find(r=>r.fecha===f)){DB.runs.push({fecha:f,dist,dur,ritmo,vel:cv(dist,dur)});sortR();}
     renderAll();
     clearParcForm();
     setStatus('Guardado - '+new Date().toLocaleTimeString(),'var(--green)');
     toast('Sesion con parciales guardada!');
-  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  }catch(e){console.error(e);toast('No se guardó: '+(e.message||'sin conexión'));setStatus('Error al guardar: '+(e.message||'sin conexión'),'var(--red)');}
   setBtnLoading('btn-save-parc',false);
 }
 
@@ -1136,9 +1192,10 @@ function renderParcialesPage(){
 async function saveRun(){
   const f=document.getElementById('r-fecha').value;
   const d=parseFloat(document.getElementById('r-dist').value);
-  const dur=document.getElementById('r-dur').value.trim();
+  const dur=normDur(document.getElementById('r-dur').value.trim());
   const rm=document.getElementById('r-ritmo').value.trim();
   if(!f||!d||!dur||!rm){toast('Completa todos los campos obligatorios');return;}
+  if(DB.runs.find(r=>r.fecha===f&&parseNum(r.dist)===d&&r.dur===dur)){toast('Esa sesion ya esta guardada');return;}
   const run={fecha:f,dist:d,dur,ritmo:rm,vel:cv(d,dur)};
   setBtnLoading('btn-save-run',true);
   setStatus('Guardando sesion...','var(--amber)');
@@ -1148,7 +1205,7 @@ async function saveRun(){
     ['r-dist','r-dur','r-ritmo'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     setStatus('Guardado - '+new Date().toLocaleTimeString(),'var(--green)');
     toast('Sesion guardada!');
-  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  }catch(e){console.error(e);toast('No se guardó: '+(e.message||'sin conexión'));setStatus('Error al guardar: '+(e.message||'sin conexión'),'var(--red)');}
   setBtnLoading('btn-save-run',false);
 }
 
@@ -1173,7 +1230,7 @@ async function saveHealth(){
     ['r-cadencia','r-fc','r-fc-max','r-ta-sis','r-ta-dia'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     setStatus('Vitales guardados - '+new Date().toLocaleTimeString(),'var(--green)');
     toast('Vitales guardados!');
-  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  }catch(e){console.error(e);toast('No se guardó: '+(e.message||'sin conexión'));setStatus('Error al guardar: '+(e.message||'sin conexión'),'var(--red)');}
   setBtnLoading('btn-save-health',false);
 }
 
@@ -1198,7 +1255,7 @@ async function saveWeather(){
     document.getElementById('r-nubosidad').value='';
     setStatus('Clima guardado - '+new Date().toLocaleTimeString(),'var(--green)');
     toast('Clima guardado!');
-  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  }catch(e){console.error(e);toast('No se guardó: '+(e.message||'sin conexión'));setStatus('Error al guardar: '+(e.message||'sin conexión'),'var(--red)');}
   setBtnLoading('btn-save-weather',false);
 }
 async function saveWeight(){
@@ -1214,7 +1271,7 @@ async function saveWeight(){
     ['w-peso','w-cintura','w-cadera','w-cuello'].forEach(id=>document.getElementById(id).value='');
     setStatus('Guardado - '+new Date().toLocaleTimeString(),'var(--green)');
     toast('Medidas guardadas en Google Sheets!');
-  }catch(e){toast('Error al guardar - verificá tu conexion');setStatus('Error al guardar','var(--red)');}
+  }catch(e){console.error(e);toast('No se guardó: '+(e.message||'sin conexión'));setStatus('Error al guardar: '+(e.message||'sin conexión'),'var(--red)');}
   setBtnLoading('btn-save-weight',false);
 }
 async function delRun(fecha){
